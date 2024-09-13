@@ -53,32 +53,37 @@ namespace CodixaApi.Controllers
         }
 
 
-        [HttpGet("GetAllUsers")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            // Retrieve all users
-            var users = await _unitOfWork.UsersManger.GetAllUsersAsync();
 
-            if (users == null || !users.Any())
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginUserDto userDto)
+        {
+            if (!ModelState.IsValid)
             {
-                return NotFound("No users found.");
+                return Unauthorized();
             }
 
-            // Map users to DTOs
-            var userDtos = users.Select(user => new UserDto
+            var user = await _unitOfWork.UsersManger.FindByNameAsync(userDto.UserName);
+            if (user == null)
             {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                Roles = _unitOfWork.UsersManger.GetRolesAsync(user).Result // Retrieve roles for each user
-            }).ToList();
+                return Unauthorized();
+            }
 
-            return Ok(userDtos);
+            var isPasswordValid = await _unitOfWork.UsersManger.CheckPasswordAsync(user, userDto.Password);
+            if (!isPasswordValid)
+            {
+                return Unauthorized();
+            }
+
+            var roles = await _unitOfWork.UsersManger.GetRolesAsync(user);
+            var token = GenerateJwtToken(user, roles);
+
+            return Ok(new
+            {
+                token,
+                expiration = DateTime.UtcNow.AddHours(1),
+            });
         }
-
-
-
 
 
         private string GenerateJwtToken(AppUser user, IList<string> roles)
