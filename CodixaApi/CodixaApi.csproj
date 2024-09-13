@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Codixa.EF\Codixa.EF.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
