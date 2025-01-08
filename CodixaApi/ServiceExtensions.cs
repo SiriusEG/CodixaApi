@@ -1,6 +1,6 @@
-﻿using Codxia.Core;
+﻿using Codixa.Core.Models.UserModels;
+using Codxia.Core;
 using Codxia.Core.Interfaces;
-using Codxia.Core.Models;
 using Codxia.EF;
 using Codxia.EF.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

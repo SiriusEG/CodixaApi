@@ -1,5 +1,4 @@
 ﻿using Codxia.Core.Interfaces;
-using Codxia.Core.Models;
 using Codxia.EF.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Codxia.Core;
+using Codixa.Core.Models.UserModels;
 
 namespace Codxia.EF
 {
@@ -28,6 +28,12 @@ namespace Codxia.EF
             UsersManger = new UserRepository(_userManager);
 
 
+        }
+
+        public async Task<List<T>> ExecuteStoredProcedureAsync<T>(string storedProcedure, params object[] parameters) where T : class
+        {
+           
+            return await _Context.Set<T>().FromSqlRaw(storedProcedure, parameters).ToListAsync();
         }
 
         public async Task<int> Complete()

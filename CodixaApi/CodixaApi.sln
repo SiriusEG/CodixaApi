@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codixa.Core", "Codixa.Core\Codixa.Core.csproj", "{4945C7AF-9092-4871-8693-E079CA39A63B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codixa.EF", "Codixa.EF\Codixa.EF.csproj", "{46F9FCE5-14EA-4260-8273-D957C94C06EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodixaApi", "CodixaApi\CodixaApi.csproj", "{21D5F66B-77E2-4995-B07C-E79A7B0AAADF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4945C7AF-9092-4871-8693-E079CA39A63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4945C7AF-9092-4871-8693-E079CA39A63B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4945C7AF-9092-4871-8693-E079CA39A63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4945C7AF-9092-4871-8693-E079CA39A63B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46F9FCE5-14EA-4260-8273-D957C94C06EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46F9FCE5-14EA-4260-8273-D957C94C06EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46F9FCE5-14EA-4260-8273-D957C94C06EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46F9FCE5-14EA-4260-8273-D957C94C06EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21D5F66B-77E2-4995-B07C-E79A7B0AAADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21D5F66B-77E2-4995-B07C-E79A7B0AAADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21D5F66B-77E2-4995-B07C-E79A7B0AAADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21D5F66B-77E2-4995-B07C-E79A7B0AAADF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB2F2937-7D43-4421-A397-570ECA129D71}
+	EndGlobalSection
+EndGlobal

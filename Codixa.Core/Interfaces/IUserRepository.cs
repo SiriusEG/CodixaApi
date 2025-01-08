@@ -1,4 +1,4 @@
-﻿using Codxia.Core.Models;
+﻿using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

@@ -12,6 +12,8 @@ namespace Codxia.Core
 
 
         IUserRepository UsersManger { get; }
+        Task<List<T>> ExecuteStoredProcedureAsync<T>(string storedProcedure, params object[] parameters) where T : class;
+
         Task<int> Complete();
     }
 }

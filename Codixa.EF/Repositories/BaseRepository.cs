@@ -17,33 +17,40 @@ namespace Codxia.EF.Repositories
             _Context = context;
         }
 
-        public T Add(T entity)
+        public async Task<T> AddAsync(T entity)
         {
-            _Context.Set<T>().Add(entity);
+            await _Context.Set<T>().AddAsync(entity);
             return entity;
         }
 
-        public void Delete(T entity)
+        public Task DeleteAsync(T entity)
         {
             _Context.Set<T>().Remove(entity);
+            return Task.CompletedTask;
         }
 
-        public IEnumerable<T> GetAll() => _Context.Set<T>().ToList();
-        public async Task<IEnumerable<T>> GetAllAsync() => await _Context.Set<T>().ToListAsync();
-        public T GetById(int id) => _Context.Set<T>().Find(id);
-        public void AddRange(IEnumerable<T> entities)
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            _Context.Set<T>().AddRange(entities);
+            return await _Context.Set<T>().ToListAsync();
+        }
+       
+        public async Task<T> GetByIdAsync(int id) => await _Context.Set<T>().FindAsync(id);
+
+        public Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            return _Context.Set<T>().AddRangeAsync(entities);
         }
 
-        public void DeleteRange(IEnumerable<T> entities)
+        public Task DeleteRangeAsync(IEnumerable<T> entities)
         {
             _Context.Set<T>().RemoveRange(entities);
+            return Task.CompletedTask;
         }
-        public T Update(T entity)
+
+        public Task<T> UpdateAsync(T entity)
         {
             _Context.Set<T>().Update(entity);
-            return entity;
+            return Task.FromResult(entity);
         }
     }
 }

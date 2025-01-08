@@ -1,5 +1,7 @@
 ﻿using Codixa.Core.Models;
-using Codxia.Core.Models;
+using Codixa.Core.Models.CourseModels;
+using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,12 +24,14 @@ namespace Codxia.EF
         public DbSet<Course> Courses { get; set; }
         public DbSet<courseFeedback> courseFeedbacks { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
-        public DbSet<Grade> Grades { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
-        public DbSet<lesson_resources> lesson_resources { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<Section> Sections { get; set; }
+        public DbSet<ChoicesQuestion> ChoicesQuestions { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<SectionTest> SectionTests { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -39,6 +43,9 @@ namespace Codxia.EF
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
         }
     }
 }

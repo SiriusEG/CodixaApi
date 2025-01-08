@@ -8,15 +8,18 @@ namespace Codxia.Core.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
-        T GetById(int id);
+        Task<T> AddAsync(T entity);
 
-        IEnumerable<T> GetAll();
-        T Add(T entity);
-        T Update(T entity);
-
-        void Delete(T entity);
+        Task DeleteAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync();
-        void DeleteRange(IEnumerable<T> entities);
-        void AddRange(IEnumerable<T> entities);
+
+        Task<T> GetByIdAsync(int id);
+
+        Task AddRangeAsync(IEnumerable<T> entities);
+
+        Task DeleteRangeAsync(IEnumerable<T> entities);
+
+        Task<T> UpdateAsync(T entity);
+   
     }
 }

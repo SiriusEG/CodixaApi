@@ -1,5 +1,5 @@
-﻿using Codxia.Core.Interfaces;
-using Codxia.Core.Models;
+﻿using Codixa.Core.Models.UserModels;
+using Codxia.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
