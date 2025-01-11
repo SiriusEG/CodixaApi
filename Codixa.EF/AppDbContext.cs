@@ -32,6 +32,8 @@ namespace Codxia.EF
         public DbSet<SectionTest> SectionTests { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<InstructorJoinRequest> InstructorJoinRequests { get; set; }
+        public DbSet<CourseRequest> CourseRequests { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

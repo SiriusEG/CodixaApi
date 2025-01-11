@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Codixa.EF.Dtos.AccountDtos
+namespace Codixa.Core.Dtos.AccountDtos.Request
 {
     public class LoginUserDto
     {

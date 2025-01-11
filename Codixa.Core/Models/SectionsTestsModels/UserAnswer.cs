@@ -14,17 +14,20 @@ namespace Codixa.Core.Models.SectionsTestsModels
         [Key]
         public int UserAnswerId { get; set; }
 
-        [ForeignKey("Student")]
+
         public int StudentId { get; set; }
+        [ForeignKey(nameof(StudentId))]
         public virtual Student Student { get; set; }
 
-        [ForeignKey("Question")]
+
         public int QuestionId { get; set; }
+        [ForeignKey(nameof(QuestionId))]
         public virtual Question Question { get; set; }
 
 
-        [ForeignKey("ChoicesQuestion")]
+
         public int SelectedChoicesQuestionId { get; set; }
+        [ForeignKey(nameof(SelectedChoicesQuestionId))]
         public virtual ChoicesQuestion ChoicesQuestion { get; set; }
     }
 }

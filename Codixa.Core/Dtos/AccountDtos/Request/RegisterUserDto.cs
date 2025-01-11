@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Codixa.EF.Dtos.AccountDtos
+namespace Codixa.Core.Dtos.AccountDtos.Request
 {
     public class RegisterUserDto
     {

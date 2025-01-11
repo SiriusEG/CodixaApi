@@ -20,5 +20,7 @@ namespace Codixa.Core.Models.UserModels
         public string UserId { get; set; }
         public virtual AppUser User { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
+        public ICollection<CourseRequest> ReviewedRequests { get; set; }
+
     }
 }

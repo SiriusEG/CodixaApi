@@ -1,13 +1,9 @@
-﻿using Codixa.Core.Models.UserModels;
-using Codixa.EF.Dtos.AccountDtos;
-using Codxia.Core;
+﻿using Azure.Core;
+using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace CodixaApi.Controllers
 {
@@ -15,13 +11,12 @@ namespace CodixaApi.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IConfiguration _configuration;
+        private readonly IAuthenticationService _AuthenticationService;
+     
 
-        public AccountController(IUnitOfWork unitOfWork, IConfiguration configuration)
+        public AccountController(IAuthenticationService authenticationService)
         {
-            _unitOfWork = unitOfWork;
-            _configuration = configuration;
+            _AuthenticationService = authenticationService;
         }
 
 
@@ -29,27 +24,31 @@ namespace CodixaApi.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
         {
-            var user = new AppUser { UserName = model.UserName, Email = model.Email };
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
             // Create the user
-            var result = await _unitOfWork.UsersManger.CreateAsync(user, model.Password);
+            var result = await _AuthenticationService.RegisterInstructorAsync(model);
 
             if (result.Succeeded)
             {
-                // Assign role to the user
-                await _unitOfWork.UsersManger.AddToRoleAsync(user, model.Role);
-
-
-                // Save the changes to the database
-                await _unitOfWork.Complete();
-
                 return Ok(new
                 {
-                    message = "User registered successfully"
-
+                    Message = "User registered successfully."
                 });
             }
 
-            return BadRequest(result.Errors);
+            // Return errors if registration failed
+            return BadRequest(new
+            {
+                Message = "User registration failed.",
+                Errors = result.Errors
+            });
         }
 
 
@@ -63,57 +62,27 @@ namespace CodixaApi.Controllers
                 return Unauthorized();
             }
 
-            var user = await _unitOfWork.UsersManger.FindByNameAsync(userDto.UserName);
-            if (user == null)
+            try
             {
-                return Unauthorized();
+                var token = await _AuthenticationService.LoginAsync(userDto);
+                return Ok(new { Token = token });
             }
-
-            var isPasswordValid = await _unitOfWork.UsersManger.CheckPasswordAsync(user, userDto.Password);
-            if (!isPasswordValid)
+            catch (UserNotFoundException ex)
             {
-                return Unauthorized();
+                return NotFound(new { Message = ex.Message });
             }
-
-            var roles = await _unitOfWork.UsersManger.GetRolesAsync(user);
-            var token = GenerateJwtToken(user, roles);
-
-            return Ok(new
+            catch (InvalidPasswordException ex)
             {
-                token,
-                expiration = DateTime.UtcNow.AddHours(1),
-            });
+                return Unauthorized(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request." });
+            }
         }
 
 
-        private string GenerateJwtToken(AppUser user, IList<string> roles)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-
-            };
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: signingCredentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+     
 
 
     }

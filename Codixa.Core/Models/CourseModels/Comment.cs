@@ -11,13 +11,16 @@ namespace Codixa.Core.Models.CourseModels
         public string CommentText { get; set; }
 
 
-        [ForeignKey("User")]
+
         public string UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
         public virtual AppUser User { get; set; }
 
 
-        [ForeignKey("Lesson")]
+  
         public int LessonId { get; set; }
+        [ForeignKey(nameof(LessonId))]
         public virtual Lesson Lesson { get; set; }
     }
 }

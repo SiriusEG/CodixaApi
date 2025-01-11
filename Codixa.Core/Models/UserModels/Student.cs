@@ -17,8 +17,10 @@ namespace Codixa.Core.Models.UserModels
         public string StudentFullName { get; set; }
 
 
-        [ForeignKey("User")]
+
         public string UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+
         public virtual AppUser User { get; set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; set; }
@@ -26,5 +28,8 @@ namespace Codixa.Core.Models.UserModels
         public virtual ICollection<Certification> Certifications { get; set; }
         public virtual ICollection<UserAnswer> UserAnswers { get; set; }
         public virtual ICollection<TestResult> TestResults { get; set; }
+
+        public ICollection<CourseRequest> CourseRequests { get; set; }
+
     }
 }

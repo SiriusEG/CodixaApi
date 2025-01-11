@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Codixa.Core.Models.UserModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,8 +23,9 @@ namespace Codixa.Core.Models.CourseModels
 
         public int LessonOrder { get; set; }
 
-        [ForeignKey("Section")]
+
         public int SectionId { get; set; }
+        [ForeignKey(nameof(SectionId))]
         public virtual Section Section { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }

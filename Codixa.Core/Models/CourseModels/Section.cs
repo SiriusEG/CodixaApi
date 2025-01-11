@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.UserModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,8 +18,9 @@ namespace Codixa.Core.Models.CourseModels
 
         public int SectionOrder { get; set; }
 
-        [ForeignKey("Course")]
+
         public int CourseId { get; set; }
+        [ForeignKey(nameof(CourseId))]
         public virtual Course Course { get; set; }
 
         public virtual SectionTest SectionTest { get; set; }

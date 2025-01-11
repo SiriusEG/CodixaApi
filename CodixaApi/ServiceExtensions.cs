@@ -1,4 +1,6 @@
-﻿using Codixa.Core.Models.UserModels;
+﻿using Codixa.Core.Interfaces;
+using Codixa.Core.Models.UserModels;
+using CodixaApi.Services;
 using Codxia.Core;
 using Codxia.Core.Interfaces;
 using Codxia.EF;
@@ -27,11 +29,13 @@ namespace CodxiaApi
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
             // Register UnitOfWork for Dependency Injection
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Register Repositories for Dependency Injection
-            services.AddTransient<IUserRepository, UserRepository>();
-            // services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+
+         
+       
 
             // Add Identity
             services.AddIdentity<AppUser, IdentityRole>()

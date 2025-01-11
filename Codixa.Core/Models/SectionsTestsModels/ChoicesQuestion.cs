@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Codixa.Core.Models.UserModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,8 +17,9 @@ namespace Codixa.Core.Models.SectionsTestsModels
         public string ChoicesQuestionText { get; set; }
         public bool IsTrue { get; set; }
 
-        [ForeignKey("Question")]
+
         public int QuestionId { get; set; }
+        [ForeignKey(nameof(QuestionId))]
         public virtual Question Question { get; set; }
     }
 }

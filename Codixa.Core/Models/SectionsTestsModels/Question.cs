@@ -16,8 +16,9 @@ namespace Codixa.Core.Models.SectionsTestsModels
 
 
 
-        [ForeignKey("SectionTest")]
+
         public int SectionTestId { get; set; }
+        [ForeignKey(nameof(SectionTestId))]
         public virtual SectionTest SectionTest { get; set; }
 
         public virtual ICollection<ChoicesQuestion> ChoicesQuestions { get; set; }

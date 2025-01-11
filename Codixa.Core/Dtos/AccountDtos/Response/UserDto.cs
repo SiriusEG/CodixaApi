@@ -1,4 +1,4 @@
-﻿namespace Codixa.EF.Dtos.AccountDtos
+﻿namespace Codixa.Core.Dtos.AccountDtos.Response
 {
     public class UserDto
     {

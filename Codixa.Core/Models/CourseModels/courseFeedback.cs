@@ -17,13 +17,15 @@ namespace Codixa.Core.Models.CourseModels
 
 
 
-        [ForeignKey("Course")]
+
         public int CourseId { get; set; }
+        [ForeignKey(nameof(CourseId))]
         public virtual Course Course { get; set; }
 
 
-        [ForeignKey("Student")]
+
         public int StudentId { get; set; }
+        [ForeignKey(nameof(StudentId))]
         public virtual Student Student { get; set; }
     }
 }

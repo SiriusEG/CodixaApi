@@ -14,13 +14,16 @@ namespace Codixa.Core.Models.CourseModels
         [Key]
         public int EnrollmentId { get; set; }
 
-        [ForeignKey("Student")]
+        public DateTime EnrollmentDate { get; set; }
+
+
         public int StudentId { get; set; }
-        [ForeignKey("Course")]
+
         public int CourseId { get; set; }
 
-
+        [ForeignKey(nameof(StudentId))]
         public virtual Student Student { get; set; }
+        [ForeignKey(nameof(CourseId))]
         public virtual Course Course { get; set; }
     }
 }

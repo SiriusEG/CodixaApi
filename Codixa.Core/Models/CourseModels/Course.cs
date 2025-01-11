@@ -16,18 +16,25 @@ namespace Codixa.Core.Models.CourseModels
         public string CourseName { get; set; }
         public string CourseDescription { get; set; }
 
-        [ForeignKey("Category")]
+
         public int CategoryId { get; set; }
 
 
-        [ForeignKey("Instructor")]
+    
         public int InstructorId { get; set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; set; }
+        [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; }
+
         public virtual ICollection<Section>? Sections { get; set; }
+        [ForeignKey(nameof(InstructorId))]
         public virtual Instructor Instructor { get; set; }
+
         public virtual ICollection<courseFeedback> courseFeedbacks { get; set; }
+
+        public ICollection<CourseRequest> CourseRequests { get; set; }
+
 
     }
 }
