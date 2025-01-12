@@ -1,8 +1,6 @@
-﻿using Azure.Core;
-using Codixa.Core.Custom_Exceptions;
+﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodixaApi.Controllers
@@ -20,9 +18,9 @@ namespace CodixaApi.Controllers
         }
 
 
-        [HttpPost("register")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
+        [HttpPost("Register-Student")]
+     
+        public async Task<IActionResult> RegisterStudent([FromBody] RegisterStudentDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -33,7 +31,7 @@ namespace CodixaApi.Controllers
                 });
             }
             // Create the user
-            var result = await _AuthenticationService.RegisterInstructorAsync(model);
+            var result = await _AuthenticationService.RegisterStudentAsync(model);
 
             if (result.Succeeded)
             {
@@ -52,6 +50,59 @@ namespace CodixaApi.Controllers
         }
 
 
+        [HttpPost("Register-Instructor")]
+        public async Task<IActionResult> RegisterInstructor([FromForm] RegisterInstructorDto model)
+        {
+          
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+
+            try
+            {
+               
+                var result = await _AuthenticationService.RegisterInstructorAsync(model);
+
+                if (result.Succeeded)
+                {
+                  
+                    return Ok(new
+                    {
+                        Message = "Your Request successfully Sent."
+                    });
+                }
+
+               
+                return BadRequest(new
+                {
+                    Message = "Your Request failed to Sent.",
+                    Errors = result.Errors.Select(e => e.Description) // Extract error descriptions
+                });
+            }
+            catch (FileUplodingException ex)
+            {
+                
+                return BadRequest(new
+                {
+                    Message = "File upload failed.",
+                    Error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+               
+                return StatusCode(500, new
+                {
+                    Message = "An unexpected error occurred.",
+                    Error = ex.Message
+                });
+            }
+        }
 
 
         [HttpPost("Login")]
@@ -59,7 +110,11 @@ namespace CodixaApi.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return Unauthorized();
+                return BadRequest(new
+                {
+                    Message = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
             }
 
             try
@@ -80,10 +135,6 @@ namespace CodixaApi.Controllers
                 return StatusCode(500, new { Message = "An error occurred while processing your request." });
             }
         }
-
-
-     
-
 
     }
 }

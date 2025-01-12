@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Codixa.Core.Models
+namespace Codixa.Core.Models.sharedModels
 {
     public class Certification
     {

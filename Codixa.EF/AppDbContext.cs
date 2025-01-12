@@ -1,6 +1,6 @@
-﻿using Codixa.Core.Models;
-using Codixa.Core.Models.CourseModels;
+﻿using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +34,7 @@ namespace Codxia.EF
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<InstructorJoinRequest> InstructorJoinRequests { get; set; }
         public DbSet<CourseRequest> CourseRequests { get; set; }
+        public DbSet<FileEntity> Files { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

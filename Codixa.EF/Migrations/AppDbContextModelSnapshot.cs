@@ -22,30 +22,6 @@ namespace Codixa.EF.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Codixa.Core.Models.Certification", b =>
-                {
-                    b.Property<int>("CertificationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertificationId"));
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TestResultId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CertificationId");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("TestResultId")
-                        .IsUnique();
-
-                    b.ToTable("Certifications");
-                });
-
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -411,11 +387,17 @@ namespace Codixa.EF.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -472,7 +454,15 @@ namespace Codixa.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InstructorId"));
 
+                    b.Property<string>("CvFileId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("InstructorFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialty")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -481,6 +471,8 @@ namespace Codixa.EF.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("InstructorId");
+
+                    b.HasIndex("CvFileId");
 
                     b.HasIndex("UserId");
 
@@ -496,18 +488,17 @@ namespace Codixa.EF.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
 
                     b.Property<string>("AdminRemarks")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("CvFileId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("Specialty")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -518,7 +509,15 @@ namespace Codixa.EF.Migrations
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("RequestId");
+
+                    b.HasIndex("CvFileId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("InstructorJoinRequests");
                 });
@@ -544,6 +543,48 @@ namespace Codixa.EF.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("Codixa.Core.Models.sharedModels.Certification", b =>
+                {
+                    b.Property<int>("CertificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertificationId"));
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TestResultId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CertificationId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TestResultId")
+                        .IsUnique();
+
+                    b.ToTable("Certifications");
+                });
+
+            modelBuilder.Entity("Codixa.Core.Models.sharedModels.FileEntity", b =>
+                {
+                    b.Property<string>("FileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("FileId");
+
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -575,19 +616,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1a3e2a59-f32d-4cad-904a-01ab1fa9e41a",
+                            Id = "ffc92e02-3406-47e9-bb04-d49bb5cb198f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "6303743e-f26e-4b20-b9cb-d7878d519b8b",
+                            Id = "9ca89dd0-353f-4b2c-a4f7-485ec422298c",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "77a7f207-6cb5-4a7c-8fbc-e98056e86e9c",
+                            Id = "537db1e3-6118-47d7-940c-c87d6df0c34e",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -697,25 +738,6 @@ namespace Codixa.EF.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Codixa.Core.Models.Certification", b =>
-                {
-                    b.HasOne("Codixa.Core.Models.UserModels.Student", "Student")
-                        .WithMany("Certifications")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Codixa.Core.Models.SectionsTestsModels.TestResult", "TestResult")
-                        .WithOne("Certification")
-                        .HasForeignKey("Codixa.Core.Models.Certification", "TestResultId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("TestResult");
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Comment", b =>
@@ -922,6 +944,12 @@ namespace Codixa.EF.Migrations
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.Instructor", b =>
                 {
+                    b.HasOne("Codixa.Core.Models.sharedModels.FileEntity", "cv")
+                        .WithMany()
+                        .HasForeignKey("CvFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Codixa.Core.Models.UserModels.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -929,6 +957,27 @@ namespace Codixa.EF.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("cv");
+                });
+
+            modelBuilder.Entity("Codixa.Core.Models.UserModels.InstructorJoinRequest", b =>
+                {
+                    b.HasOne("Codixa.Core.Models.sharedModels.FileEntity", "cv")
+                        .WithMany()
+                        .HasForeignKey("CvFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Codixa.Core.Models.UserModels.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("cv");
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.Student", b =>
@@ -940,6 +989,25 @@ namespace Codixa.EF.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Codixa.Core.Models.sharedModels.Certification", b =>
+                {
+                    b.HasOne("Codixa.Core.Models.UserModels.Student", "Student")
+                        .WithMany("Certifications")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Codixa.Core.Models.SectionsTestsModels.TestResult", "TestResult")
+                        .WithOne("Certification")
+                        .HasForeignKey("Codixa.Core.Models.sharedModels.Certification", "TestResultId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("TestResult");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

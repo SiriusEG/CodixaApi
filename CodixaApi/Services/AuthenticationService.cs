@@ -1,6 +1,7 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Interfaces;
+using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core;
 using Codxia.EF;
@@ -12,29 +13,38 @@ using System.Text;
 
 namespace CodixaApi.Services
 {
-    public class AuthenticationService: IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
-            _configuration = configuration; 
+            _configuration = configuration;
         }
 
 
-        public async Task<IdentityResult> RegisterInstructorAsync(RegisterUserDto model)
+        public async Task<IdentityResult> RegisterStudentAsync(RegisterStudentDto model)
         {
-            var user = new AppUser { UserName = model.UserName, Email = model.Email };
+            var user = new AppUser {
+                UserName = model.UserName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Gender = model.Gender,
+                DateOfBirth = model.DateOfBirth };
             // Create the user
             var result = await _unitOfWork.UsersManger.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
                 // Assign role to the user
-                await _unitOfWork.UsersManger.AddToRoleAsync(user, model.Role);
+                await _unitOfWork.UsersManger.AddToRoleAsync(user, "Student");
 
-
+                await _unitOfWork.Students.AddAsync(new Student
+                {
+                    StudentFullName = model.FullName,
+                    UserId = user.Id
+                });
                 // Save the changes to the database
                 await _unitOfWork.Complete();
 
@@ -44,8 +54,105 @@ namespace CodixaApi.Services
             {
                 return result;
             }
-                
+
         }
+
+
+        public async Task<IdentityResult> RegisterInstructorAsync(RegisterInstructorDto model)
+        {
+            // Start a transaction
+            await using var transaction = await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                // Step 1: Upload the file
+                FileEntity file = null;
+                try
+                {
+                    file = await _unitOfWork.Files.UploadFileAsync(model.Cv, Path.Combine("uploads", "InstructorsCVs"));
+                }
+                catch (Exception ex)
+                {
+                    // Handle file upload error
+                    throw new FileUplodingException("File uploading failed: " + ex.Message);
+                }
+
+                if (file == null)
+                {
+                    throw new FileUplodingException("File uploading failed: No file was uploaded.");
+                }
+
+                // Step 2: Create the user
+                var user = new AppUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    Gender = model.Gender,
+                    DateOfBirth = model.DateOfBirth
+                };
+
+                var result = await _unitOfWork.UsersManger.CreateAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                {
+                    // Roll back the transaction if user creation fails
+                    await transaction.RollbackAsync();
+                    await _unitOfWork.Files.DeleteExistsFileAsync(file.FilePath);
+                    return result;
+                }
+
+                // Step 3: Save the file entity
+                try
+                {
+                    await _unitOfWork.Files.AddAsync(file);
+              
+                }
+                catch (Exception ex)
+                {
+                    // Roll back the transaction if file save fails
+                    await transaction.RollbackAsync();
+                    await _unitOfWork.Files.DeleteExistsFileAsync(file.FilePath);
+                    throw new Exception("Failed to save file: " + ex.Message);
+                }
+
+                // Step 4: Save the instructor request
+                try
+                {
+                    var instructorRequest = new InstructorJoinRequest
+                    {
+                        FullName = model.FullName,
+                        UserId = user.Id,
+                        Specialty = model.Specialty,
+                        CvFileId = file.FileId,
+                        SubmittedAt = DateTime.Now
+                    };
+
+                    await _unitOfWork.InstructorJoinRequests.AddAsync(instructorRequest);
+                }
+                catch (Exception ex)
+                {
+                    // Roll back the transaction if instructor save fails
+                    await transaction.RollbackAsync();
+                    await _unitOfWork.Files.DeleteExistsFileAsync(file.FilePath);
+                    throw new Exception("Failed to save instructor request: " + ex.Message);
+                }
+
+                // Step 5: Commit the transaction if everything succeeds
+                await _unitOfWork.Complete();
+                await transaction.CommitAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Roll back the transaction if any other error occurs
+                await transaction.RollbackAsync();
+                throw new Exception("Failed to register instructor: " + ex.Message);
+            }
+        }
+
+
 
         public async Task<string> LoginAsync(LoginUserDto model)
         {

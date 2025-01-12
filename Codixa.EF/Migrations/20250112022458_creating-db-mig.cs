@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Codixa.EF.Migrations
 {
     /// <inheritdoc />
-    public partial class addingentitiesprops : Migration
+    public partial class creatingdbmig : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,6 +32,8 @@ namespace Codixa.EF.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Gender = table.Column<bool>(type: "bit", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -64,6 +66,19 @@ namespace Codixa.EF.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    FileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.FileId);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,26 +188,6 @@ namespace Codixa.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Instructors",
-                columns: table => new
-                {
-                    InstructorId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    InstructorFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Instructors", x => x.InstructorId);
-                    table.ForeignKey(
-                        name: "FK_Instructors_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -209,6 +204,65 @@ namespace Codixa.EF.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InstructorJoinRequests",
+                columns: table => new
+                {
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AdminRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CvFileId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InstructorJoinRequests", x => x.RequestId);
+                    table.ForeignKey(
+                        name: "FK_InstructorJoinRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InstructorJoinRequests_Files_CvFileId",
+                        column: x => x.CvFileId,
+                        principalTable: "Files",
+                        principalColumn: "FileId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Instructors",
+                columns: table => new
+                {
+                    InstructorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InstructorFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CvFileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Instructors", x => x.InstructorId);
+                    table.ForeignKey(
+                        name: "FK_Instructors_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Instructors_Files_CvFileId",
+                        column: x => x.CvFileId,
+                        principalTable: "Files",
+                        principalColumn: "FileId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -265,11 +319,47 @@ namespace Codixa.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CourseRequests",
+                columns: table => new
+                {
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    RequestStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReviewedBy = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseRequests", x => x.RequestId);
+                    table.ForeignKey(
+                        name: "FK_CourseRequests_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseRequests_Instructors_ReviewedBy",
+                        column: x => x.ReviewedBy,
+                        principalTable: "Instructors",
+                        principalColumn: "InstructorId");
+                    table.ForeignKey(
+                        name: "FK_CourseRequests_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Enrollments",
                 columns: table => new
                 {
                     EnrollmentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    EnrollmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -510,9 +600,9 @@ namespace Codixa.EF.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "4d61f69f-842d-4b7a-9308-7a35cd847b9b", null, "Admin", "ADMIN" },
-                    { "9a1699c8-f2fd-468e-89a9-7ee5d9c167ad", null, "Student", "STUDENT" },
-                    { "9e545899-0bbe-4224-9f03-7fed4b876565", null, "Instructor", "INSTRUCTOR" }
+                    { "537db1e3-6118-47d7-940c-c87d6df0c34e", null, "Student", "STUDENT" },
+                    { "9ca89dd0-353f-4b2c-a4f7-485ec422298c", null, "Instructor", "INSTRUCTOR" },
+                    { "ffc92e02-3406-47e9-bb04-d49bb5cb198f", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -591,6 +681,21 @@ namespace Codixa.EF.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseRequests_CourseId",
+                table: "CourseRequests",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseRequests_ReviewedBy",
+                table: "CourseRequests",
+                column: "ReviewedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseRequests_StudentId",
+                table: "CourseRequests",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Courses_CategoryId",
                 table: "Courses",
                 column: "CategoryId");
@@ -609,6 +714,21 @@ namespace Codixa.EF.Migrations
                 name: "IX_Enrollments_StudentId",
                 table: "Enrollments",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InstructorJoinRequests_CvFileId",
+                table: "InstructorJoinRequests",
+                column: "CvFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InstructorJoinRequests_UserId",
+                table: "InstructorJoinRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Instructors_CvFileId",
+                table: "Instructors",
+                column: "CvFileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Instructors_UserId",
@@ -695,7 +815,13 @@ namespace Codixa.EF.Migrations
                 name: "courseFeedbacks");
 
             migrationBuilder.DropTable(
+                name: "CourseRequests");
+
+            migrationBuilder.DropTable(
                 name: "Enrollments");
+
+            migrationBuilder.DropTable(
+                name: "InstructorJoinRequests");
 
             migrationBuilder.DropTable(
                 name: "UserAnswers");
@@ -735,6 +861,9 @@ namespace Codixa.EF.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Files");
         }
     }
 }

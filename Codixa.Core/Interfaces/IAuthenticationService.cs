@@ -7,7 +7,8 @@ namespace Codixa.Core.Interfaces
     public interface IAuthenticationService
     {
 
-        Task<IdentityResult> RegisterInstructorAsync(RegisterUserDto model);
+        Task<IdentityResult> RegisterStudentAsync(RegisterStudentDto model);
+        Task<IdentityResult> RegisterInstructorAsync(RegisterInstructorDto model);
         Task<string> LoginAsync(LoginUserDto model);
 
 

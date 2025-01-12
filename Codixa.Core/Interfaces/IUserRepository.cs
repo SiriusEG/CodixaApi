@@ -22,5 +22,7 @@ namespace Codxia.Core.Interfaces
         Task<IdentityResult> ChangeUserNameAsync(AppUser user, string newUserName);
 
         Task<IEnumerable<AppUser>> GetAllUsersAsync();
+
+       
     }
 }

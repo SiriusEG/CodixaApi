@@ -12,5 +12,8 @@ namespace Codixa.Core.Models.UserModels
 {
     public class AppUser : IdentityUser
     {
+        public bool Gender { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
     }
 }

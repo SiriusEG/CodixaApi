@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.sharedModels;
 
 namespace Codixa.Core.Models.UserModels
 {
@@ -29,7 +30,7 @@ namespace Codixa.Core.Models.UserModels
         public virtual ICollection<UserAnswer> UserAnswers { get; set; }
         public virtual ICollection<TestResult> TestResults { get; set; }
 
-        public ICollection<CourseRequest> CourseRequests { get; set; }
+        public virtual ICollection<CourseRequest> CourseRequests { get; set; }
 
     }
 }

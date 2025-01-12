@@ -1,5 +1,5 @@
-﻿using Codixa.Core.Models;
-using Codixa.Core.Models.SectionsTestsModels;
+﻿using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.sharedModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

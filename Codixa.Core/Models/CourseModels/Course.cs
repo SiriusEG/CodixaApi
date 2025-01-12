@@ -33,7 +33,7 @@ namespace Codixa.Core.Models.CourseModels
 
         public virtual ICollection<courseFeedback> courseFeedbacks { get; set; }
 
-        public ICollection<CourseRequest> CourseRequests { get; set; }
+        public virtual ICollection<CourseRequest> CourseRequests { get; set; }
 
 
     }

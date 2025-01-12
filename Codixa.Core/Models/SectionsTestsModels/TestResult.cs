@@ -1,4 +1,5 @@
-﻿using Codixa.Core.Models.UserModels;
+﻿using Codixa.Core.Models.sharedModels;
+using Codixa.Core.Models.UserModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
