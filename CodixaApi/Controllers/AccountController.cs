@@ -81,7 +81,7 @@ namespace CodixaApi.Controllers
                 return BadRequest(new
                 {
                     Message = "Your Request failed to Sent.",
-                    Errors = result.Errors.Select(e => e.Description) // Extract error descriptions
+                   
                 });
             }
             catch (FileUplodingException ex)
@@ -90,7 +90,7 @@ namespace CodixaApi.Controllers
                 return BadRequest(new
                 {
                     Message = "File upload failed.",
-                    Error = ex.Message
+                   
                 });
             }
             catch (Exception ex)
@@ -99,7 +99,7 @@ namespace CodixaApi.Controllers
                 return StatusCode(500, new
                 {
                     Message = "An unexpected error occurred.",
-                    Error = ex.Message
+                  
                 });
             }
         }

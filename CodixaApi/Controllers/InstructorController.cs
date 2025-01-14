@@ -5,7 +5,7 @@ namespace CodixaApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeacherController : ControllerBase
+    public class InstructorController : ControllerBase
     {
     }
 }

@@ -33,6 +33,7 @@ namespace CodxiaApi
             // Register Repositories for Dependency Injection
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IAdminDashboardService, AdminDashboardService>();
 
          
        

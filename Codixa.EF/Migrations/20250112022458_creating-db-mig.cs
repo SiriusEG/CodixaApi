@@ -229,13 +229,13 @@ namespace Codixa.EF.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_InstructorJoinRequests_Files_CvFileId",
                         column: x => x.CvFileId,
                         principalTable: "Files",
                         principalColumn: "FileId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(

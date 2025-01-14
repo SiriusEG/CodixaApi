@@ -1,12 +1,16 @@
-﻿using Codixa.Core.Models.CourseModels;
+﻿using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.response;
+using Codixa.Core.Interfaces;
+using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
 using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
+using Codixa.EF.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,7 +52,21 @@ namespace Codxia.EF
             base.OnModelCreating(builder);
 
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+         
+            var assembly = Assembly.Load("Codixa.Core");
 
+       
+            var keylessEntities = assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract && typeof(IKeylessEntity).IsAssignableFrom(t));
+
+      
+            foreach (var entityType in keylessEntities)
+            {
+                var configurationType = typeof(KeylessEntityConfiguration<>).MakeGenericType(entityType);
+                var configuration = Activator.CreateInstance(configurationType);
+                builder.ApplyConfiguration((dynamic)configuration);
+            }
         }
+        
     }
 }
