@@ -363,4 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 
-D:\repos\CodixaApi\CodixaApi\appsettings.json
+# Ignore appsettings files
+appsettings.json
+appsettings.*.json
