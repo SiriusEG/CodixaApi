@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,6 +52,11 @@ namespace Codxia.EF.Repositories
         {
             _Context.Set<T>().Update(entity);
             return Task.FromResult(entity);
+        }
+
+        public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _Context.Set<T>().FirstOrDefaultAsync(predicate);    
         }
     }
 }

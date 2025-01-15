@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
 
 namespace Codixa.Core.Models.CourseModels
@@ -15,6 +16,10 @@ namespace Codixa.Core.Models.CourseModels
         public int CourseId { get; set; }
         public string CourseName { get; set; }
         public string CourseDescription { get; set; }
+
+        public bool IsPublished { get; set; }
+
+        public string CourseCardPhotoId { get; set; }
 
 
         public int CategoryId { get; set; }
@@ -34,6 +39,9 @@ namespace Codixa.Core.Models.CourseModels
         public virtual ICollection<courseFeedback> courseFeedbacks { get; set; }
 
         public virtual ICollection<CourseRequest> CourseRequests { get; set; }
+
+        [ForeignKey(nameof(CourseCardPhotoId))]
+        public virtual FileEntity Photo { get; set; }
 
 
     }

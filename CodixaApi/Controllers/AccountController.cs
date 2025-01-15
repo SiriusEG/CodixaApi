@@ -1,7 +1,9 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.AccountDtos.Response;
 using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodixaApi.Controllers
 {
@@ -119,8 +121,8 @@ namespace CodixaApi.Controllers
 
             try
             {
-                var token = await _AuthenticationService.LoginAsync(userDto);
-                return Ok(new { Token = token });
+                LoginTokenDto token = await _AuthenticationService.LoginAsync(userDto);
+                return Ok(token);
             }
             catch (UserNotFoundException ex)
             {
@@ -133,6 +135,40 @@ namespace CodixaApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "An error occurred while processing your request." });
+            }
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] LoginTokenDto loginToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Return a 400 Bad Request if the model is invalid
+                return BadRequest("Invalid request data.");
+            }
+
+            try
+            {
+                // Call the service method to refresh the token
+                var result = await _AuthenticationService.RefreshToken(loginToken);
+
+                // Return the new tokens as a 200 OK response
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Handle unauthorized access (e.g., invalid or expired refresh token)
+                return Unauthorized(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle database update errors (e.g., failed to update or add refresh token)
+                return StatusCode(500, "An error occurred while updating the database.");
+            }
+            catch (Exception ex)
+            {
+                // Handle any other unexpected exceptions
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 

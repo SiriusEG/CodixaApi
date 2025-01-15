@@ -4,6 +4,7 @@ using Codxia.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Codixa.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250115134015_adding-refreshtoken")]
+    partial class addingrefreshtoken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,10 +191,6 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CourseCardPhotoId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("CourseDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -203,14 +202,9 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("InstructorId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.HasKey("CourseId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("CourseCardPhotoId");
 
                     b.HasIndex("InstructorId");
 
@@ -760,19 +754,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "8c41f499-66d5-43dd-830c-e29f1401eb70",
+                            Id = "83d2149c-9b3a-4953-9070-6200e5c478b5",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "0982b3bb-4ceb-43cb-b250-f81ef3656395",
+                            Id = "ee07753c-1dc2-4367-8c8d-933d3ee1974b",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "e8e71bdd-6a67-48b1-9ebf-c6a988916f11",
+                            Id = "55691549-12fd-42c9-af68-8bd2c7eef320",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -911,12 +905,6 @@ namespace Codixa.EF.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Codixa.Core.Models.sharedModels.FileEntity", "Photo")
-                        .WithMany()
-                        .HasForeignKey("CourseCardPhotoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Codixa.Core.Models.UserModels.Instructor", "Instructor")
                         .WithMany("Courses")
                         .HasForeignKey("InstructorId")
@@ -926,8 +914,6 @@ namespace Codixa.EF.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Instructor");
-
-                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.CourseRequest", b =>

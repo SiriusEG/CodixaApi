@@ -1,14 +1,17 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.AccountDtos.Response;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core;
 using Codxia.EF;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace CodixaApi.Services
@@ -153,8 +156,9 @@ namespace CodixaApi.Services
         }
 
 
+   
 
-        public async Task<string> LoginAsync(LoginUserDto model)
+        public async Task<LoginTokenDto> LoginAsync(LoginUserDto model)
         {
             var user = await _unitOfWork.UsersManger.FindByNameAsync(model.UserName);
             if (user == null)
@@ -167,21 +171,73 @@ namespace CodixaApi.Services
             {
                 throw new InvalidPasswordException("Invalid password.");
             }
+           
+            var expiresRefrshTokeninDayes = int.Parse(_configuration["JWT:ExpiresRefreshToken"]);
+            RefreshToken refreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                refreshToken = GenerateRefreshToken(),
+                ExpiresAt = DateTime.UtcNow.AddDays(expiresRefrshTokeninDayes),
+                CreatedAt = DateTime.UtcNow,
+                IsRevoked = false
+            };
 
-            var roles = await _unitOfWork.UsersManger.GetRolesAsync(user);
-            var token = GenerateJwtToken(user, roles);
-            return token;
+            await _unitOfWork.RefreshTokens.AddAsync(refreshToken);
+            await _unitOfWork.Complete();
+
+            var token = await GenerateJwtToken(user.Id);
+
+
+
+            return new LoginTokenDto { Token = token,RefreshToken = refreshToken.refreshToken };
         }
 
 
-
-
-        private string GenerateJwtToken(AppUser user, IList<string> roles)
+        public async Task<LoginTokenDto> RefreshToken(LoginTokenDto model)
         {
+            var RecivedUserId = await GetUserIdFromToken(model.Token);
+            var storedToken = await _unitOfWork.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.refreshToken == model.RefreshToken && rt.UserId == RecivedUserId);
+
+            if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+            }
+
+            storedToken.IsRevoked = true;
+            await _unitOfWork.RefreshTokens.UpdateAsync(storedToken);
+
+            var newAccessToken = await GenerateJwtToken(RecivedUserId);
+            var expiresRefrshTokeninDayes = int.Parse(_configuration["JWT:ExpiresRefreshToken"]);
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = RecivedUserId,
+                refreshToken = GenerateRefreshToken(),
+                ExpiresAt = DateTime.UtcNow.AddDays(expiresRefrshTokeninDayes),
+                CreatedAt = DateTime.UtcNow,
+                IsRevoked = false
+            };
+
+            await _unitOfWork.RefreshTokens.AddAsync(newRefreshToken);
+            await _unitOfWork.Complete();
+
+            return new LoginTokenDto {RefreshToken = newRefreshToken.refreshToken, Token = newAccessToken};
+        }
+
+        private async Task<string> GenerateJwtToken(string userId)
+        {
+
+            var User = await _unitOfWork.UsersManger.FindByIdAsync(userId);
+
+
+            var roles = await _unitOfWork.UsersManger.GetRolesAsync(User);
+
+
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, User.UserName),
+                new Claim(ClaimTypes.NameIdentifier, User.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 
             };
@@ -193,18 +249,64 @@ namespace CodixaApi.Services
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var expiresInMinutes = int.Parse(_configuration["JWT:Expires"]);
+
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
                 signingCredentials: signingCredentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
- 
+
+        private string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
+        }
+
+
+
+        public async Task<string> GetUserIdFromToken(string token)
+        {
+            try
+            {
+                // Remove "Bearer " prefix if present
+                if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+
+                // Create a JWT token handler
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Read the token without validating it (use only for trusted tokens)
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                // Extract the user ID from the claims
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "sub" || claim.Type == ClaimTypes.NameIdentifier);
+
+                if (userIdClaim != null)
+                {
+                    return userIdClaim.Value;
+                }
+
+                throw new Exception("User ID claim not found in the token.");
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw new Exception("Failed to extract user ID from token.", ex);
+            }
+        }
     }
 }

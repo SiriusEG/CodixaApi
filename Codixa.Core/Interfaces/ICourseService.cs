@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Codixa.Core.Dtos.CourseDto.Request;
+using Codixa.Core.Dtos.CourseDto.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +12,9 @@ namespace Codixa.Core.Interfaces
     {
 
 
+        Task<addCourseResponseDto> addCourse(addCourseRequestDto courseRequestDto, string token);
 
 
-        
+
     }
 }

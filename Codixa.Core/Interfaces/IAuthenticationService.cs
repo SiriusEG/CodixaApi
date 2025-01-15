@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.AccountDtos.Response;
 using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,11 +10,13 @@ namespace Codixa.Core.Interfaces
 
         Task<IdentityResult> RegisterStudentAsync(RegisterStudentDto model);
         Task<IdentityResult> RegisterInstructorAsync(RegisterInstructorDto model);
-        Task<string> LoginAsync(LoginUserDto model);
+        Task<LoginTokenDto> LoginAsync(LoginUserDto model);
 
+        Task<LoginTokenDto> RefreshToken(LoginTokenDto model);
 
+        Task<string> GetUserIdFromToken(string token);
 
-
+       
     }
 
 

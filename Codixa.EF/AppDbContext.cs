@@ -39,6 +39,7 @@ namespace Codxia.EF
         public DbSet<InstructorJoinRequest> InstructorJoinRequests { get; set; }
         public DbSet<CourseRequest> CourseRequests { get; set; }
         public DbSet<FileEntity> Files { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

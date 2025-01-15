@@ -1,8 +1,11 @@
 ﻿using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.response;
 using Codixa.Core.Interfaces;
+using Codixa.Core.Models.UserModels;
 using Codxia.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using System.Collections.Immutable;
 
@@ -47,7 +50,36 @@ namespace CodixaApi.Services
             return rowsAffected;
         }
 
+        public async Task<IdentityResult> RegisterAdminAsync(registerAdminRequestDto registerAdminRequestDto)
+        {
+           
+            var user = new AppUser
+            {
+                UserName = registerAdminRequestDto.UserName,
+                Email = registerAdminRequestDto.Email,
+                PhoneNumber = registerAdminRequestDto.PhoneNumber,
+                Gender = registerAdminRequestDto.Gender,
+                DateOfBirth = registerAdminRequestDto.DateOfBirth
+            };
 
+
+
+            var result = await _unitOfWork.UsersManger.CreateAsync(user, registerAdminRequestDto.Password);
+
+
+            if (result.Succeeded)
+            {
+                // Assign role to the user
+                await _unitOfWork.UsersManger.AddToRoleAsync(user, "Admin");
+
+         
+                // Save the changes to the database
+                await _unitOfWork.Complete();
+
+               
+            }
+            return result;
+        }
 
         public Task<List<ReturnAllApprovedInstructorsDto>> GetAllApprovedInstructors()
         {

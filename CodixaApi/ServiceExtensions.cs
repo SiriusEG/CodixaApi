@@ -34,6 +34,7 @@ namespace CodxiaApi
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAdminDashboardService, AdminDashboardService>();
+            services.AddTransient<ICourseService, CourseService>();
 
          
        

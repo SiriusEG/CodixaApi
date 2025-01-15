@@ -1,12 +1,4 @@
-﻿using Codixa.Core.Models;
-using Codixa.Core.Models.SectionsTestsModels;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Codixa.Core.Models.UserModels
 {
@@ -15,5 +7,7 @@ namespace Codixa.Core.Models.UserModels
         public bool Gender { get; set; }
 
         public DateTime DateOfBirth { get; set; }
+
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

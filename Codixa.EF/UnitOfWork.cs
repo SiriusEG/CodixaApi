@@ -25,10 +25,12 @@ namespace Codxia.EF
         public IUserRepository UsersManger { get; private set; }
         private readonly IWebHostEnvironment _environment;
         public IBaseRepository<Category> Categories { get; private set; }
+        public IBaseRepository<RefreshToken> RefreshTokens { get; private set; }
         public IBaseRepository<Student> Students { get; private set; }
         public IBaseRepository<Instructor> Instructors { get; private set; }
         public IBaseRepository<InstructorJoinRequest> InstructorJoinRequests { get; private set; }
         public IFileRepository Files { get; private set; }
+        public IBaseRepository<Course> Courses { get; private set; }
 
         public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
@@ -39,10 +41,11 @@ namespace Codxia.EF
             Students = new BaseRepository<Student>(_Context);
             Instructors = new BaseRepository<Instructor>(_Context);
             Categories = new BaseRepository<Category>(_Context);
+            RefreshTokens = new BaseRepository<RefreshToken>(_Context);
             InstructorJoinRequests = new BaseRepository<InstructorJoinRequest>(_Context);
             Files = new FileRepository(_Context, _environment);
 
-
+            Courses = new BaseRepository<Course>(_Context);
 
         }
 

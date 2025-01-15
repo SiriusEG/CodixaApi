@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -68,7 +69,35 @@ namespace CodixaApi.Controllers
         }
 
 
-        
+        [HttpPost("registerAdmin")]
+        public async Task<IActionResult> registerAdmin([FromBody]registerAdminRequestDto registerAdminRequestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid request data." + ModelState.Values.SelectMany(e=>e.Errors),
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+            // Create the user
+            var result = await _adminDashboardService.RegisterAdminAsync(registerAdminRequestDto);
+
+            if (result.Succeeded)
+            {
+                return Ok(new
+                {
+                    Message = "User registered successfully."
+                });
+            }
+
+            // Return errors if registration failed
+            return BadRequest(new
+            {
+                Message = "User registration failed. " + result.Errors,
+                
+            });
+        }
 
     }
 }
