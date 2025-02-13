@@ -4,6 +4,7 @@ using Codxia.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Codixa.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210221136_addingpreveiw-boolean")]
+    partial class addingpreveiwboolean
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,14 +311,12 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("VideoId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("VideoLink")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("LessonId");
 
                     b.HasIndex("SectionId");
-
-                    b.HasIndex("VideoId");
 
                     b.ToTable("Lessons");
                 });
@@ -765,19 +766,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0939b953-e58c-438f-986d-fe629cc10f4d",
+                            Id = "c4c26ce9-24df-424e-99b2-4d087c29357c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "41b37f63-20f9-40ea-834a-564f96e99131",
+                            Id = "efd402d7-2255-4502-99af-a1f986524759",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "554fe377-70e3-48b5-9235-d7b1b461c6c8",
+                            Id = "3b40c8a2-ae2b-4bc9-a696-d7fa2a54aaaa",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -987,13 +988,7 @@ namespace Codixa.EF.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Codixa.Core.Models.sharedModels.FileEntity", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId");
-
                     b.Navigation("Section");
-
-                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Section", b =>

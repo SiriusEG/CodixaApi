@@ -27,6 +27,8 @@ namespace Codxia.EF
         public IBaseRepository<Category> Categories { get; private set; }
         public IBaseRepository<RefreshToken> RefreshTokens { get; private set; }
         public IBaseRepository<Student> Students { get; private set; }
+        public IBaseRepository<Lesson> Lessons { get; private set; }
+        public IBaseRepository<Section> Sections { get; private set; }
         public IBaseRepository<Instructor> Instructors { get; private set; }
         public IBaseRepository<InstructorJoinRequest> InstructorJoinRequests { get; private set; }
         public IFileRepository Files { get; private set; }
@@ -46,6 +48,8 @@ namespace Codxia.EF
             Files = new FileRepository(_Context, _environment);
 
             Courses = new BaseRepository<Course>(_Context);
+            Sections = new BaseRepository<Section>(_Context);
+            Lessons = new BaseRepository<Lesson>(_Context);
 
         }
 

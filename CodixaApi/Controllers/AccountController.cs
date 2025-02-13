@@ -20,7 +20,7 @@ namespace CodixaApi.Controllers
         }
 
 
-        [HttpPost("Register-Student")]
+        [HttpPost("RegisterNewStudent")]
      
         public async Task<IActionResult> RegisterStudent([FromBody] RegisterStudentDto model)
         {
@@ -52,7 +52,7 @@ namespace CodixaApi.Controllers
         }
 
 
-        [HttpPost("Register-Instructor")]
+        [HttpPost("RegisterNewInstructor")]
         public async Task<IActionResult> RegisterInstructor([FromForm] RegisterInstructorDto model)
         {
           
@@ -82,7 +82,7 @@ namespace CodixaApi.Controllers
                
                 return BadRequest(new
                 {
-                    Message = "Your Request failed to Sent.",
+                    Message = "Your Request failed to Sent, " + result.Errors.First().Description,
                    
                 });
             }
@@ -91,7 +91,7 @@ namespace CodixaApi.Controllers
                 
                 return BadRequest(new
                 {
-                    Message = "File upload failed.",
+                    Message = "File upload failed." + ex,
                    
                 });
             }

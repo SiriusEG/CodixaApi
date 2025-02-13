@@ -19,10 +19,11 @@ namespace Codxia.Core.Interfaces
         Task AddRangeAsync(IEnumerable<T> entities);
 
         Task DeleteRangeAsync(IEnumerable<T> entities);
-
+        Task<ICollection<T>> GetListOfEntitiesByIdIncludesAsync(Expression<Func<T, bool>> keySelector,params Func<IQueryable<T>, IQueryable<T>>[] includes);
         Task<T> UpdateAsync(T entity);
 
-        Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> keySelector,
+        params Func<IQueryable<T>, IQueryable<T>>[] includes);
 
     }
 }

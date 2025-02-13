@@ -13,8 +13,9 @@ namespace Codixa.Core.Interfaces
 
 
         Task<addCourseResponseDto> addCourse(addCourseRequestDto courseRequestDto, string token);
+        Task<string> DeleteCourse(int CourseId);
 
-
+        Task<List<GetAllCoursesDetailsResponseDto>> GetUserCourses(string token);
 
     }
 }

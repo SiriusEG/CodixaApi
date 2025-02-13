@@ -11,6 +11,8 @@ namespace Codxia.Core
         IBaseRepository<Student> Students { get; }
         IBaseRepository<Instructor> Instructors { get; }
         IBaseRepository<Category> Categories { get; }
+        IBaseRepository<Lesson> Lessons { get; }
+        IBaseRepository<Section> Sections { get; }
         IBaseRepository<Course> Courses { get; }
         IBaseRepository<RefreshToken> RefreshTokens { get; }
         IBaseRepository<InstructorJoinRequest> InstructorJoinRequests { get; }

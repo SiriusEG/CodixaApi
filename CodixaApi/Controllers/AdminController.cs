@@ -22,7 +22,7 @@ namespace CodixaApi.Controllers
 
 
 
-        [HttpGet("Instructors-Requests")]
+        [HttpGet("GetInstructorsRequests")]
         public async Task<IActionResult> GetAllInstructorsRequests()
         {
             var result = await _adminDashboardService.GetAllInstructors();
@@ -32,7 +32,7 @@ namespace CodixaApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("Get-Instructor")]
+        [HttpGet("GetApprovedInstructors")]
         public async Task<IActionResult> GetAllApprovedInstructors()
         {
 
@@ -44,7 +44,7 @@ namespace CodixaApi.Controllers
             return Ok(result);
         }
             
-        [HttpPut("Instructor-Status")]
+        [HttpPut("ChangeInstructorStatus")]
         public async Task<IActionResult> ChangeInstructorRequestStatus(ChangeInstructorRequestStatusDto requestStatusDto)
         {
             try
@@ -69,7 +69,7 @@ namespace CodixaApi.Controllers
         }
 
 
-        [HttpPost("registerAdmin")]
+        [HttpPost("RegisterAdmin")]
         public async Task<IActionResult> registerAdmin([FromBody]registerAdminRequestDto registerAdminRequestDto)
         {
             if (!ModelState.IsValid)
