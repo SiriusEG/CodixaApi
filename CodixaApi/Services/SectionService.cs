@@ -5,7 +5,9 @@ using Codixa.Core.Dtos.SectionsDtos.Respone;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
 using Codxia.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace CodixaApi.Services
 {
@@ -174,5 +176,90 @@ namespace CodixaApi.Services
             return new UpdateSectionNameResDto {SectionName= updateSectionNameReqDto.NewSectionName };
 
         }
+
+        public async Task<int> UpdateSectionsAndLessonsAsync(List<UpdateSectionLessonNameOrderdto> sectionsToUpdate)
+        {
+            try
+            {
+                if (sectionsToUpdate == null || sectionsToUpdate.Count == 0)
+                {
+                    throw new ArgumentException("No sections provided for update.");
+                }
+
+                // Create DataTable for Sections
+                var sectionTable = new DataTable();
+                sectionTable.Columns.Add("SectionId", typeof(int));
+                sectionTable.Columns.Add("SectionOrder", typeof(int));
+                sectionTable.Columns.Add("SectionName", typeof(string));
+
+                // Create DataTable for Lessons
+                var lessonTable = new DataTable();
+                lessonTable.Columns.Add("LessonId", typeof(int));
+                lessonTable.Columns.Add("SectionId", typeof(int));
+                lessonTable.Columns.Add("LessonOrder", typeof(int));
+                lessonTable.Columns.Add("LessonName", typeof(string));
+
+                // Fill DataTables
+                foreach (var section in sectionsToUpdate)
+                {
+                    sectionTable.Rows.Add(
+                        section.SectionId,
+                        (object?)section.SectionOrder ?? DBNull.Value,
+                        (object?)section.SectionName ?? DBNull.Value
+                    );
+
+                    if (section.Lessons != null)
+                    {
+                        foreach (var lesson in section.Lessons)
+                        {
+                            lessonTable.Rows.Add(
+                                lesson.LessonId,
+                                section.SectionId,
+                                (object?)lesson.LessonOrder ?? DBNull.Value,
+                                (object?)lesson.LessonName ?? DBNull.Value
+                            );
+                        }
+                    }
+                }
+
+                // Define SQL Parameters
+                var sectionParam = new SqlParameter("@SectionUpdates", SqlDbType.Structured)
+                {
+                    TypeName = "SectionUpdateType",
+                    Value = sectionTable
+                };
+
+                var lessonParam = new SqlParameter("@LessonUpdates", SqlDbType.Structured)
+                {
+                    TypeName = "LessonUpdateType",
+                    Value = lessonTable
+                };
+
+                // Execute Stored Procedure & Read Multiple Results
+                var updatedSections = await _unitOfWork.ExecuteStoredProcedureAsyncIntReturn(
+                    "UpdateSectionsAndLessons @SectionUpdates, @LessonUpdates", sectionParam, lessonParam
+                );
+
+          
+                // Group Lessons Inside Their Sections
+           
+
+                return updatedSections;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while updating sections and lessons: " + sqlEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating sections and lessons: " + ex.Message);
+            }
+        }
+
+
+
+
+
+
     }
 }

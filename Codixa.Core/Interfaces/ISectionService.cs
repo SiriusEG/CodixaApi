@@ -15,5 +15,6 @@ namespace Codixa.Core.Interfaces
        Task<List<AddSectionResponse>> GetSections(int CourseId);
        Task<string> DeleteSection(DeleteSectionRequestDto deleteSectionRequestDto);
        Task<UpdateSectionNameResDto> UpdateSectionName(UpdateSectionNameReqDto updateSectionNameReqDto);
+       Task<int> UpdateSectionsAndLessonsAsync(List<UpdateSectionLessonNameOrderdto> sectionsToUpdate);
     }
 }

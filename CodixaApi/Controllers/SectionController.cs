@@ -7,6 +7,7 @@ using CodixaApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace CodixaApi.Controllers
 {
@@ -113,6 +114,23 @@ namespace CodixaApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
+            }
+        }
+
+
+        [HttpPut("UpdateSectionsLessons")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> UpdateSectionsAndLessons([FromBody] List<UpdateSectionLessonNameOrderdto> sectionsToUpdate)
+        {
+            try
+            {
+                var updatedSections = await _sectionService.UpdateSectionsAndLessonsAsync(sectionsToUpdate);
+
+                return Ok(new { message = "Sections and lessons updated successfully."});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating sections and lessons.", error = ex.Message });
             }
         }
 
