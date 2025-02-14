@@ -1,4 +1,5 @@
-﻿using Codixa.Core.Models.UserModels;
+﻿using Codixa.Core.Models.sharedModels;
+using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Codxia.Core.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<AppUser>
     {
         Task<IdentityResult> CreateAsync(AppUser user, string password);
         Task<AppUser> FindByNameAsync(string username);

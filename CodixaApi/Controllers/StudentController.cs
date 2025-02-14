@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Interfaces;
+using CodixaApi.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodixaApi.Controllers
@@ -7,5 +11,52 @@ namespace CodixaApi.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
+        private readonly IStudentService _studentService;
+
+        public StudentController(IStudentService studentService)
+        {
+           _studentService = studentService;
+        }
+
+
+        //send Request enroll course
+        [HttpPost("StudentRequestToEnrollCourse/{CourseId}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> StudentRequestToEnrollCourse([FromRoute] int CourseId)
+        {
+            try
+            {
+                // Extract the token from the Authorization header
+                string token = null;
+                if (HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                {
+                    token = authHeader.ToString().Replace("Bearer ", "").Trim();
+                }
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest(new { Message = "Authorization token is missing." });
+                }
+
+                // Pass the token and DTO to the service class
+                var result = await _studentService.RequestToEnrollCourse(CourseId, token);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+
+        }
+
+        //edit profile
+        //changepassword
+        //my Courses
+
+
+
+
+
+
     }
 }

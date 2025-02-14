@@ -8,6 +8,7 @@ using Codixa.Core.Dtos.LessonDtos.Request;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Codixa.Core.Custom_Exceptions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CodixaApi.Services
 {
@@ -66,15 +67,19 @@ namespace CodixaApi.Services
 
 
         //get user courses
-        public async Task<List<GetAllCoursesDetailsResponseDto>> GetUserCourses(string token)
+        public async Task<(List<GetAllCoursesDetailsResponseDto> Courses,int PageCount)> GetUserCourses(string token,int PageNumber,int PageSize )
         {
 
             try
             {
                 var UserID = await _authenticationService.GetUserIdFromToken(token);
                 if (UserID != null) {
-                    var result = await _unitOfWork.ExecuteStoredProcedureAsync<GetAllCoursesDetailsResponseDto>("GetCoursesByUserId @UserId", new SqlParameter("@UserId", UserID));
-                    return result;
+                    var(result, totalCount) = await _unitOfWork.ExecuteStoredProcedureWithCountAsync<GetAllCoursesDetailsResponseDto>("GetCoursesByUserId", 
+                        new SqlParameter("@UserId", UserID),
+                        new SqlParameter("@PageNumber", PageNumber),
+                        new SqlParameter("@PageSize", PageSize));
+                    int totalPages = (int)Math.Ceiling((double)totalCount / PageSize);
+                    return (result, totalPages);
                 }
                 throw new UserNotFoundException("Login To Get Your Courses!");
             }
@@ -86,10 +91,84 @@ namespace CodixaApi.Services
         }
         //updateCourseDetails
 
+        public async Task<string> UpdateCourse(UpdateCourseRequestDto courseRequestDto)
+        {
+            try
+            {
+                // Fetch the existing course
+                Course OldCourse = await _unitOfWork.Courses.FirstOrDefaultAsync(
+                    x => x.CourseId == courseRequestDto.CourseId,
+                    z => z.Include(x => x.Photo)
+                );
 
+                if (OldCourse == null)
+                {
+                    throw new Exception("Course Not Found!");
+                }
+
+                // Update course properties if provided
+                if (!string.IsNullOrEmpty(courseRequestDto.CourseName))
+                {
+                    OldCourse.CourseName = courseRequestDto.CourseName;
+                }
+                if (!string.IsNullOrEmpty(courseRequestDto.CourseDescription))
+                {
+                    OldCourse.CourseDescription = courseRequestDto.CourseDescription;
+                }
+                if (courseRequestDto.IsPublished.HasValue)
+                {
+                    OldCourse.IsPublished = courseRequestDto.IsPublished.Value;
+                }
+                if (courseRequestDto.CategoryId.HasValue && courseRequestDto.CategoryId != 0)
+                {
+                    OldCourse.CategoryId = courseRequestDto.CategoryId.Value;
+                }
+
+                // Handle file update (delete old file and upload new file)
+                if (courseRequestDto.CourseCardPhoto != null && courseRequestDto.CourseCardPhoto.Length != 0)
+                {
+                    try
+                    {
+                        // Delete the old file
+                        if (OldCourse.Photo != null)
+                        {
+                            await _unitOfWork.Files.DeleteExistsFileAsync(OldCourse.Photo.FilePath);
+                            await _unitOfWork.Files.DeleteAsync(OldCourse.Photo);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error occurred while deleting the old file: " + ex.Message);
+                    }
+
+                    try
+                    {
+                        // Upload the new file
+                        OldCourse.Photo = await _unitOfWork.Files.UploadFileAsync(
+                            courseRequestDto.CourseCardPhoto,
+                            Path.Combine("uploads", "Courses-Card-Photos")
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error occurred while uploading the new file: " + ex.Message);
+                    }
+                }
+
+                // Update the course and save changes
+                await _unitOfWork.Courses.UpdateAsync(OldCourse);
+                await _unitOfWork.Complete();
+
+                return "Course Updates Successfully";
+            }
+            catch (Exception)
+            {
+                // Re-throw the exception with a custom message or log it
+                throw;
+            }
 
             //delete course
-
+        }
         public async Task<string> DeleteCourse(int CourseId)
         {
             // Update Lesson

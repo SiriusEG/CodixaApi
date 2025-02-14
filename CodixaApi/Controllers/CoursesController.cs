@@ -20,12 +20,10 @@ namespace CodixaApi.Controllers
             _courseService = courseService; 
         
         }
-        //add course
 
-
-        [HttpGet("GetCoursesByUserToken")]
+        [HttpGet("GetCoursesByUserToken/{PageNumber}")]
         [Authorize(Roles = "Instructor")]
-        public async Task<IActionResult> GetUserCourses() {
+        public async Task<IActionResult> GetUserCourses([FromRoute]int PageNumber) {
 
             try
             {
@@ -42,8 +40,8 @@ namespace CodixaApi.Controllers
                 }
 
                 // Pass the token and DTO to the service class
-                var result = await _courseService.GetUserCourses(token);
-                return Ok(result);
+                var (Courses, totalPages) = await _courseService.GetUserCourses(token,PageNumber,6);
+                return Ok(new { Courses, totalPages });
             }
             catch (Exception ex)
             {
@@ -51,11 +49,6 @@ namespace CodixaApi.Controllers
             }
 
         }
-
-          
-        
-        
-
 
 
         [HttpPost("AddNewCourse")]
@@ -90,18 +83,7 @@ namespace CodixaApi.Controllers
 
             return BadRequest("Invalid Data Request!");
         }
-
-
-        //get Course info by id
-
-        //Det All Cources
-
-        //get Courses by search
-
-
-
         //delete course
-
 
         [HttpDelete("Delete/{CourseId}")]
         [Authorize(Roles = "Instructor")]
@@ -124,8 +106,34 @@ namespace CodixaApi.Controllers
         }
 
         //update course
+        [HttpPut("Update")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> UpdateCourse([FromForm] UpdateCourseRequestDto updateCourseRequestDto)
+        {
+            try
+            {
+                if (ModelState == null)
+                {
+                    return BadRequest("Course data Is Empty");
+                }
+                var result = await _courseService.UpdateCourse(updateCourseRequestDto);
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        //get Course info by id
 
 
+
+
+        //Det All Cources
+
+        //get Courses by search
 
     }
 }

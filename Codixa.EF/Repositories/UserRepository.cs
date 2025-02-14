@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace Codxia.EF.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<AppUser>, IUserRepository
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public UserRepository(UserManager<AppUser> userManager)
+        public UserRepository(UserManager<AppUser> userManager, AppDbContext context) : base(context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUser user, string password)

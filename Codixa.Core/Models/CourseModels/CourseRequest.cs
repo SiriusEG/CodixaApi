@@ -15,7 +15,7 @@ namespace Codixa.Core.Models.CourseModels
         public int RequestId { get; set; } // Primary Key
         public int StudentId { get; set; } // Foreign Key
         public int CourseId { get; set; } // Foreign Key
-        public string RequestStatus { get; set; } // Pending, Approved, Rejected
+        public string RequestStatus { get; set; } = "Pending";// Pending, Approved, Rejected
         public DateTime RequestDate { get; set; } 
         public DateTime? ReviewDate { get; set; }
         public int? ReviewedBy { get; set; } // Teacher ID (Nullable)
