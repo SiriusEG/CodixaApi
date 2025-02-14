@@ -56,69 +56,45 @@ The API will be available at: **`http://localhost:5000`**
 
 ---
 
-📜 API Endpoints
+## 📜 API Endpoints
 
-🔐 Authentication
+### 🔐 Authentication
+- `POST /api/Account/RegisterNewStudent` → Register a new student
+- `POST /api/Account/RegisterNewInstructor` → Register a new instructor
+- `POST /api/Account/Login` → Login and receive a JWT token
+- `POST /api/Account/RefreshToken` → Refresh authentication token
 
-POST /api/Account/RegisterNewStudent → Register a new student
+### 👨‍🏫 Admin
+- `GET /api/Admin/GetInstructorsRequests` → Get pending instructor requests
+- `GET /api/Admin/GetApprovedInstructors` → Get approved instructors
+- `PUT /api/Admin/ChangeInstructorStatus` → Change instructor approval status
+- `POST /api/Admin/RegisterAdmin` → Register a new admin
 
-POST /api/Account/RegisterNewInstructor → Register a new instructor
+### 📚 Courses
+- `GET /api/Courses/GetCoursesByUserToken/{PageNumber}` → Get courses for authenticated users
+- `POST /api/Courses/AddNewCourse` → Add a new course
+- `DELETE /api/Courses/Delete/{CourseId}` → Delete a course
+- `PUT /api/Courses/Update` → Update course details
 
-POST /api/Account/Login → Login and receive a JWT token
+### 📂 Course Categories
+- `GET /api/CourseCategory` → Get all course categories
+- `POST /api/CourseCategory` → Add a new category
+- `PUT /api/CourseCategory` → Update a category
+- `DELETE /api/CourseCategory` → Delete a category
 
-POST /api/Account/RefreshToken → Refresh authentication token
+### 🎓 Student
+- `POST /api/Student/StudentRequestToEnrollCourse/{CourseId}` → Request enrollment in a course
 
-👨‍🏫 Admin
+### 📖 Sections
+- `GET /api/Section/GetAllSections/{CourseId}` → Get all sections of a course
+- `POST /api/Section/AddNewSection` → Add a new section
+- `PUT /api/Section/UpdateSectionName` → Update section name
+- `DELETE /api/Section/Delete` → Delete a section
+- `PUT /api/Section/UpdateSectionsLessons` → Update section lessons
 
-GET /api/Admin/GetInstructorsRequests → Get pending instructor requests
-
-GET /api/Admin/GetApprovedInstructors → Get approved instructors
-
-PUT /api/Admin/ChangeInstructorStatus → Change instructor approval status
-
-POST /api/Admin/RegisterAdmin → Register a new admin
-
-📚 Courses
-
-GET /api/Courses/GetCoursesByUserToken/{PageNumber} → Get courses for authenticated users
-
-POST /api/Courses/AddNewCourse → Add a new course
-
-DELETE /api/Courses/Delete/{CourseId} → Delete a course
-
-PUT /api/Courses/Update → Update course details
-
-📂 Course Categories
-
-GET /api/CourseCategory → Get all course categories
-
-POST /api/CourseCategory → Add a new category
-
-PUT /api/CourseCategory → Update a category
-
-DELETE /api/CourseCategory → Delete a category
-
-🎓 Student
-
-POST /api/Student/StudentRequestToEnrollCourse/{CourseId} → Request enrollment in a course
-
-📖 Sections
-
-GET /api/Section/GetAllSections/{CourseId} → Get all sections of a course
-
-POST /api/Section/AddNewSection → Add a new section
-
-PUT /api/Section/UpdateSectionName → Update section name
-
-DELETE /api/Section/Delete → Delete a section
-
-PUT /api/Section/UpdateSectionsLessons → Update section lessons
-
-🎥 Lessons
-
-POST /api/Lesson/AddNewLesson → Add a new lesson
-
-DELETE /api/Lesson/Delete → Delete a lesson
+### 🎥 Lessons
+- `POST /api/Lesson/AddNewLesson` → Add a new lesson
+- `DELETE /api/Lesson/Delete` → Delete a lesson
 
 ---
 
