@@ -58,21 +58,6 @@ The API will be available at: **`http://localhost:5000`**
 
 ## 📜 API Endpoints
 
-### 🔐 Authentication
-- `POST /api/auth/register` → Register a new user  
-- `POST /api/auth/login` → Login and receive a JWT token  
-
-### 📚 Courses
-- `GET /api/courses` → Get all courses (Paginated)  
-- `GET /api/courses/{id}` → Get course by ID  
-- `POST /api/courses` → Create a new course *(Admin/Instructor only)*  
-- `PUT /api/courses/{id}` → Update a course *(Admin/Instructor only)*  
-- `DELETE /api/courses/{id}` → Delete a course *(Admin only)*  
-
-### 🎓 Enrollment
-- `POST /api/enrollments` → Enroll in a course  
-- `GET /api/enrollments/{userId}` → Get user’s enrolled courses  
-
 ---
 
 ## 🛠️ Contributing
