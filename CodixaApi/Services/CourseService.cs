@@ -4,11 +4,9 @@ using Codixa.Core.Interfaces;
 using Codxia.Core;
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.UserModels;
-using Codixa.Core.Dtos.LessonDtos.Request;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Codixa.Core.Custom_Exceptions;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CodixaApi.Services
 {
@@ -23,8 +21,38 @@ namespace CodixaApi.Services
             _authenticationService = authenticationService;
         }
 
-      
-       public async Task<addCourseResponseDto> addCourse(addCourseRequestDto courseRequestDto , string token)
+
+        public async Task<CourseGetResponseDto> GetCourseById(int CourseId)
+        {
+
+            try
+            {
+                var Course = await _unitOfWork.Courses.FirstOrDefaultAsync(x=>x.CourseId==CourseId & x.IsDeleted==false,c=>c.Include(x=>x.Photo));
+
+                
+
+                return new CourseGetResponseDto
+                {
+                    CourseId= Course.CourseId,
+                    CourseName = Course.CourseName,
+                    CourseDescription = Course.CourseDescription,
+                    CourseCardPhotoFilePath = Course.Photo.FilePath,
+                    CategoryId = Course.CategoryId
+                };
+            }
+            catch (Exception ex)
+            {
+               
+                throw new Exception("there are no Course With This Id ");
+
+            }
+            // return new addCourseResponseDto();
+
+        }
+
+
+
+        public async Task<addCourseResponseDto> addCourse(addCourseRequestDto courseRequestDto , string token)
         {
             var file = await _unitOfWork.Files.UploadFileAsync(courseRequestDto.CourseCardPhoto, Path.Combine("uploads", "Courses-Card-Photos"));
 
@@ -41,6 +69,7 @@ namespace CodixaApi.Services
                         CourseDescription = courseRequestDto.CourseDescription,
                         CourseCardPhotoId = file.FileId,
                         IsPublished = false,
+                        IsDeleted = false,
                         InstructorId = instructor.InstructorId,
                         CategoryId=courseRequestDto.CategoryId
                     });
@@ -91,13 +120,13 @@ namespace CodixaApi.Services
         }
         //updateCourseDetails
 
-        public async Task<string> UpdateCourse(UpdateCourseRequestDto courseRequestDto)
+        public async Task<string> UpdateCourse(int CourseId,UpdateCourseRequestDto courseRequestDto)
         {
             try
             {
                 // Fetch the existing course
                 Course OldCourse = await _unitOfWork.Courses.FirstOrDefaultAsync(
-                    x => x.CourseId == courseRequestDto.CourseId,
+                    x => x.CourseId == CourseId,
                     z => z.Include(x => x.Photo)
                 );
 
@@ -181,7 +210,8 @@ namespace CodixaApi.Services
                     {
                         throw new Exception("Course Not Found!");
                     }
-                    await _unitOfWork.Courses.DeleteAsync(Course);
+                    Course.IsDeleted = true;
+                    await _unitOfWork.Courses.UpdateAsync(Course);
                     await _unitOfWork.Complete();
                 }
                 catch (Exception ex)

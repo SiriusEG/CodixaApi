@@ -1,7 +1,8 @@
 ﻿namespace Codixa.Core.Dtos.CourseDto.Response
 {
-    public class addCourseResponseDto
+    public class CourseGetResponseDto
     {
+        public int CourseId { get; set; }
         public string CourseName { get; set; }
 
         public string CourseDescription { get; set; }

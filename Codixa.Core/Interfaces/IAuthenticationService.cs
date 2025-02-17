@@ -1,6 +1,5 @@
 ﻿using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.AccountDtos.Response;
-using Codixa.Core.Models.UserModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace Codixa.Core.Interfaces

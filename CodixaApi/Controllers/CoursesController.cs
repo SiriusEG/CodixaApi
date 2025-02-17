@@ -1,10 +1,6 @@
-﻿using Azure.Core;
-using Codixa.Core.Dtos.CourseDto.Request;
-using Codixa.Core.Dtos.SectionsDtos.Request;
+﻿using Codixa.Core.Dtos.CourseDto.Request;
 using Codixa.Core.Interfaces;
-using CodixaApi.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -21,27 +17,61 @@ namespace CodixaApi.Controllers
         
         }
 
+        [HttpGet("GetCourseById/{CourseId}")]
+        [Authorize(Roles = "Instructor")]
+
+        public async Task<IActionResult> GetCourseById([FromRoute] int CourseId)
+        {
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var Course = await _courseService.GetCourseById(CourseId);
+                    return Ok(Course);
+                }
+                return BadRequest(new { Message = "Enter Course Number" });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+
+        }
+
+
+
+
         [HttpGet("GetCoursesByUserToken/{PageNumber}")]
         [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> GetUserCourses([FromRoute]int PageNumber) {
 
+
             try
             {
-                // Extract the token from the Authorization header
-                string token = null;
-                if (HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                if (ModelState.IsValid)
                 {
-                    token = authHeader.ToString().Replace("Bearer ", "").Trim();
-                }
+                    // Extract the token from the Authorization header
+                    string token = null;
+                    if (HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                    {
+                        token = authHeader.ToString().Replace("Bearer ", "").Trim();
+                    }
 
-                if (string.IsNullOrEmpty(token))
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        return BadRequest(new { Message = "Authorization token is missing." });
+                    }
+
+                    // Pass the token and DTO to the service class
+                    var (Courses, totalPages) = await _courseService.GetUserCourses(token, PageNumber, 6);
+                    return Ok(new { Courses, totalPages });
+                }
+                else
                 {
-                    return BadRequest(new { Message = "Authorization token is missing." });
+                    return BadRequest(new { Message = "Enter Page Number" });
                 }
-
-                // Pass the token and DTO to the service class
-                var (Courses, totalPages) = await _courseService.GetUserCourses(token,PageNumber,6);
-                return Ok(new { Courses, totalPages });
             }
             catch (Exception ex)
             {
@@ -91,7 +121,7 @@ namespace CodixaApi.Controllers
         {
             try
             {
-                if (ModelState == null)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest("Course Id Is Empty");
                 }
@@ -106,17 +136,17 @@ namespace CodixaApi.Controllers
         }
 
         //update course
-        [HttpPut("Update")]
+        [HttpPut("Update/{CourseId}")]
         [Authorize(Roles = "Instructor")]
-        public async Task<IActionResult> UpdateCourse([FromForm] UpdateCourseRequestDto updateCourseRequestDto)
+        public async Task<IActionResult> UpdateCourse([FromRoute] int CourseId,[FromForm] UpdateCourseRequestDto updateCourseRequestDto)
         {
             try
             {
-                if (ModelState == null)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest("Course data Is Empty");
                 }
-                var result = await _courseService.UpdateCourse(updateCourseRequestDto);
+                var result = await _courseService.UpdateCourse(CourseId,updateCourseRequestDto);
                 
                 return Ok(result);
             }
@@ -131,7 +161,10 @@ namespace CodixaApi.Controllers
 
 
 
-        //Det All Cources
+        //get All Cources
+
+        //get course details
+
 
         //get Courses by search
 

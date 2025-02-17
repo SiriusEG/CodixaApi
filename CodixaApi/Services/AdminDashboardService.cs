@@ -7,7 +7,6 @@ using Codixa.Core.Models.UserModels;
 using Codxia.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
-using System.Collections.Immutable;
 
 namespace CodixaApi.Services
 {
@@ -18,27 +17,22 @@ namespace CodixaApi.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public Task<List<ReturnAllInstructorsReqDto>> GetAllInstructors()
+        public async Task<(List<ReturnAllInstructorsReqDto> Instructors,int PageCount)> GetAllInstructors(int pagesize,int pagenumber)
         {
-            return _unitOfWork.ExecuteStoredProcedureAsync<ReturnAllInstructorsReqDto>("ShowAllInstructorRequest");
+            var (result, totalCount) =await _unitOfWork.ExecuteStoredProcedureWithCountAsync<ReturnAllInstructorsReqDto>("ShowAllInstructorRequest",
+                   new SqlParameter("@PageSize", pagesize),
+                   new SqlParameter("@PageNumber", pagenumber));
+            return (result, totalCount);
         }
 
         public async Task<int> ChangeInstructorRequestStatus(ChangeInstructorRequestStatusDto requestStatusDto)
         {
-            // Define the allowed statuses
-            var allowedStatuses = new List<string> {"Approved", "Rejected" };
-
-            // Check if the provided status is valid
-            if (!allowedStatuses.Contains(requestStatusDto.NewStatus))
-            {
-                throw new ArgumentException("Invalid status. Allowed values are: Pending, Approved, Rejected.");
-            }
-
+ 
             // Execute the stored procedure
             int rowsAffected = await _unitOfWork.ExecuteStoredProcedureAsyncIntReturn(
-                "EXEC ChangeInstructorRequestStatus @InstructorId, @NewStatus",
-                new SqlParameter("@InstructorId", requestStatusDto.RequestId),
-                new SqlParameter("@NewStatus", requestStatusDto.NewStatus)
+                "ChangeInstructorRequestStatus @RequestId, @NewStatus",
+                new SqlParameter("@RequestId", requestStatusDto.RequestId),
+                new SqlParameter("@NewStatus", requestStatusDto.NewStatus.ToString())
             );
 
             // Check if the request ID was found

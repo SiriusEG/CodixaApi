@@ -32,12 +32,20 @@ namespace CodixaApi.Services
             FileEntity file = null;
             try
             {
-                if(AddLessonDto == null)
+                if(AddLessonDto.SectionId == 0  | AddLessonDto.LessonName == null | AddLessonDto.LessonOrder == 0)
                 {
                     throw new InvalidDataEnteredException("Lesson Info Is Empty");
                 }
-              
-                if (AddLessonDto.IsVideo && AddLessonDto.Video !=null)
+
+                if (AddLessonDto.IsVideo == true && AddLessonDto.Video == null)
+                {
+                
+                   throw new FileUplodingException("please Choose The lesson video");
+                    
+                }
+
+
+                if (AddLessonDto.IsVideo ==true && AddLessonDto.Video !=null)
                 {
                      file = await _unitOfWork.Files.UploadFileAsync(AddLessonDto.Video, Path.Combine("uploads", "CoursesVideos"));
                     if (file == null)

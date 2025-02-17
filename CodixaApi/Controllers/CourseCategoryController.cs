@@ -2,7 +2,6 @@
 using Codixa.Core.Dtos.CategoriesDto.response;
 using Codixa.Core.Models.CourseModels;
 using Codxia.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodixaApi.Controllers

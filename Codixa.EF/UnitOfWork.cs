@@ -3,11 +3,6 @@ using Codxia.EF.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Codxia.Core;
 using Codixa.Core.Models.UserModels;
 using Codixa.Core.Interfaces;
@@ -17,7 +12,6 @@ using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Models.CourseModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Reflection;
 
 namespace Codxia.EF
 {
@@ -37,13 +31,14 @@ namespace Codxia.EF
         public IFileRepository Files { get; private set; }
         public IBaseRepository<Course> Courses { get; private set; }
         public IBaseRepository<CourseRequest> CourseRequests { get; private set; }
+        public IBaseRepository<Enrollment> Enrollments { get; private set; }
 
         public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
             _Context = context;
             _environment = environment;
             _userManager = userManager;
-            UsersManger = new UserRepository(_userManager, context);
+            UsersManger = new UserRepository(_userManager, _Context);
             Students = new BaseRepository<Student>(_Context);
             Instructors = new BaseRepository<Instructor>(_Context);
             Categories = new BaseRepository<Category>(_Context);
@@ -55,6 +50,7 @@ namespace Codxia.EF
             Sections = new BaseRepository<Section>(_Context);
             Lessons = new BaseRepository<Lesson>(_Context);
             CourseRequests = new BaseRepository<CourseRequest>(_Context);
+            Enrollments = new BaseRepository<Enrollment>(_Context);
 
         }
 

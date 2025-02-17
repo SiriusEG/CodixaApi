@@ -1,8 +1,5 @@
-﻿using Codixa.Core.Custom_Exceptions;
-using Codixa.Core.Interfaces;
-using CodixaApi.Services;
+﻿using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodixaApi.Controllers

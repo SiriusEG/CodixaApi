@@ -1,11 +1,5 @@
-﻿using Codixa.Core.Dtos.LessonDtos.Request;
-using Codixa.Core.Dtos.SectionsDtos.Request;
+﻿using Codixa.Core.Dtos.SectionsDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.Respone;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Codixa.Core.Interfaces
 {

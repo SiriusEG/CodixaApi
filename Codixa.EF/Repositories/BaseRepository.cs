@@ -1,11 +1,6 @@
 ﻿using Codxia.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Codxia.EF.Repositories
 {
@@ -74,7 +69,10 @@ namespace Codxia.EF.Repositories
 
         }
 
-
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int take, int skip)
+        {
+            return await _Context.Set<T>().Where(criteria).Skip(skip).Take(take).ToListAsync();
+        }
         public async Task<ICollection<T>> GetListOfEntitiesByIdIncludesAsync(
         Expression<Func<T, bool>> keySelector,
         params Func<IQueryable<T>, IQueryable<T>>[] includes)

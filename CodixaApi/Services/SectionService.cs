@@ -1,5 +1,4 @@
 ﻿using Codixa.Core.Custom_Exceptions;
-using Codixa.Core.Dtos.LessonDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.Respone;
 using Codixa.Core.Interfaces;

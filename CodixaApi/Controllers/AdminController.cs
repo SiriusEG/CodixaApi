@@ -2,8 +2,6 @@
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodixaApi.Controllers
@@ -22,14 +20,14 @@ namespace CodixaApi.Controllers
 
 
 
-        [HttpGet("GetInstructorsRequests")]
-        public async Task<IActionResult> GetAllInstructorsRequests()
+        [HttpGet("GetInstructorsRequests/{PageNumber}")]
+        public async Task<IActionResult> GetAllInstructorsRequests([FromRoute]int PageNumber)
         {
-            var result = await _adminDashboardService.GetAllInstructors();
-            if (result == null) {
+            var (result, Totalpages) = await _adminDashboardService.GetAllInstructors(10,PageNumber);
+            if (result == null&& Totalpages == 0) {
                 return BadRequest("No Data Has Found");
             }
-            return Ok(result);
+            return Ok(new { result , Totalpages });
         }
 
         [HttpGet("GetApprovedInstructors")]
@@ -51,9 +49,12 @@ namespace CodixaApi.Controllers
             {
                 // تنفيذ العملية
                 var result = await _adminDashboardService.ChangeInstructorRequestStatus(requestStatusDto);
-
+                if(result < 1)
+                {
+                    throw new Exception("there are an error, ");
+                }
                 // إرجاع النتيجة بنجاح
-                return Ok(result);
+                return Ok("Instructor Request Updated Successfully");
             }
             catch (RequestIdnotFoundInInstructorJoinRequestsException ex)
             {

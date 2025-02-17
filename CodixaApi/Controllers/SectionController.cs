@@ -1,13 +1,8 @@
 ﻿using Codixa.Core.Custom_Exceptions;
-using Codixa.Core.Dtos.CourseDto.Request;
-using Codixa.Core.Dtos.LessonDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.Request;
 using Codixa.Core.Interfaces;
-using CodixaApi.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace CodixaApi.Controllers
 {

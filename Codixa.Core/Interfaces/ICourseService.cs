@@ -1,10 +1,5 @@
 ﻿using Codixa.Core.Dtos.CourseDto.Request;
 using Codixa.Core.Dtos.CourseDto.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Codixa.Core.Interfaces
 {
@@ -13,8 +8,9 @@ namespace Codixa.Core.Interfaces
 
 
         Task<addCourseResponseDto> addCourse(addCourseRequestDto courseRequestDto, string token);
+        Task<CourseGetResponseDto> GetCourseById(int CourseId);
         Task<string> DeleteCourse(int CourseId);
-        Task<string> UpdateCourse(UpdateCourseRequestDto courseRequestDto);
+        Task<string> UpdateCourse(int CourseId, UpdateCourseRequestDto courseRequestDto);
         Task<(List<GetAllCoursesDetailsResponseDto> Courses, int PageCount)> GetUserCourses(string token, int PageNumber, int PageSize);
 
     }

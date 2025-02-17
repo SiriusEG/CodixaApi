@@ -13,6 +13,7 @@ namespace Codxia.Core
         IBaseRepository<Category> Categories { get; }
         IBaseRepository<Lesson> Lessons { get; }
         IBaseRepository<Section> Sections { get; }
+        IBaseRepository<Enrollment> Enrollments { get; }
         IBaseRepository<Course> Courses { get; }
         IBaseRepository<CourseRequest> CourseRequests { get; }
         IBaseRepository<RefreshToken> RefreshTokens { get; }

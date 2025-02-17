@@ -2,7 +2,6 @@
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
 using Codxia.Core;
-using Microsoft.EntityFrameworkCore;
 
 namespace CodixaApi.Services
 {
@@ -35,20 +34,20 @@ namespace CodixaApi.Services
                     }
 
                 }
-                CourseRequest courseRequest = new CourseRequest{
-                    CourseId= CourseId,
-                    StudentId=Student!=null? Student.StudentId:0,
-                    RequestDate=DateTime.Now
-                };
                 try
                 {
-                    await _UnitOfWork.CourseRequests.AddAsync(courseRequest);
+                    await _UnitOfWork.CourseRequests.AddAsync(new CourseRequest
+                    {
+                        CourseId = CourseId,
+                        StudentId = Student != null ? Student.StudentId : 0,
+                        RequestDate = DateTime.Now
+                    });
                     await _UnitOfWork.Complete();
                 }
                 catch (Exception ex) { 
                     throw new Exception("there are error while sending request" + ex);
                 }
-           
+                   
 
                 return ("Request Sent Successfully");
             }

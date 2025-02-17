@@ -1,7 +1,6 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.LessonDtos.Request;
 using Codixa.Core.Interfaces;
-using CodixaApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +25,7 @@ namespace CodixaApi.Controllers
         {
             try
             {
-                if (ModelState == null) {
+                if (ModelState.IsValid) {
                     return BadRequest("Lesson Info Is Empty");
                 }
                 var result = await _lessonService.addLesson(AddLessontDto);

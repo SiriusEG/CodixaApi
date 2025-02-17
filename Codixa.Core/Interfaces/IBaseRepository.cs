@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace Codxia.Core.Interfaces
 {
@@ -21,7 +16,7 @@ namespace Codxia.Core.Interfaces
         Task DeleteRangeAsync(IEnumerable<T> entities);
         Task<ICollection<T>> GetListOfEntitiesByIdIncludesAsync(Expression<Func<T, bool>> keySelector,params Func<IQueryable<T>, IQueryable<T>>[] includes);
         Task<T> UpdateAsync(T entity);
-
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int take, int skip);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> keySelector,
         params Func<IQueryable<T>, IQueryable<T>>[] includes);
 
