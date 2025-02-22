@@ -1,35 +1,41 @@
 ﻿using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Dtos.CourseDto.Response;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
+using Codixa.Core.Models.UserModels;
 using Codxia.Core;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodixaApi.Services
 {
-    public class StudentService: IStudentService
+    public class StudentService : IStudentService
     {
         private readonly IUnitOfWork _UnitOfWork;
         private readonly IAuthenticationService _AuthenticationService;
 
-        public StudentService(IUnitOfWork unitOfWork , IAuthenticationService authenticationService)
+        public StudentService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
         {
-           _UnitOfWork = unitOfWork;
-           _AuthenticationService = authenticationService;
+            _UnitOfWork = unitOfWork;
+            _AuthenticationService = authenticationService;
         }
 
         //send Request enroll course
-        public async Task<string> RequestToEnrollCourse(int CourseId,String token)
+        public async Task<string> RequestToEnrollCourse(int CourseId, String token)
         {
             try
             {
                 var UserId = await _AuthenticationService.GetUserIdFromToken(token);
-                var Student = await _UnitOfWork.Students.FirstOrDefaultAsync(x=>x.UserId == UserId);
-                if (UserId == null | Student==null)
+                var Student = await _UnitOfWork.Students.FirstOrDefaultAsync(x => x.UserId == UserId);
+                if (UserId == null | Student == null)
                 {
                     throw new UserNotFoundException("SignIn to enroll This course");
                 }
-                if (Student != null) {
+                if (Student != null)
+                {
                     var ReqExist = await _UnitOfWork.CourseRequests.FirstOrDefaultAsync(x => x.StudentId == Student.StudentId && x.CourseId == CourseId);
-                    if (ReqExist != null) {
+                    if (ReqExist != null)
+                    {
                         throw new Exception("Request Already Sent");
                     }
 
@@ -44,22 +50,59 @@ namespace CodixaApi.Services
                     });
                     await _UnitOfWork.Complete();
                 }
-                catch (Exception ex) { 
+                catch (Exception ex)
+                {
                     throw new Exception("there are error while sending request" + ex);
                 }
-                   
+
 
                 return ("Request Sent Successfully");
             }
-            catch(UserNotFoundException) {
+            catch (UserNotFoundException)
+            {
                 throw;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 throw;
             }
-            
-        } 
+
+        }
+
+        //get students Courses
+
+        public async Task<List<GetStudentCoursesResponseDto>> GetStudentCoursesByToken(string token)
+        {
+            try
+            {
+                // تحديد مستخدم باستخدام Token
+                var UserId = await _AuthenticationService.GetUserIdFromToken(token);
+
+                // إذا كان UserId فارغًا، رمي استثناء
+                if (UserId == null)
+                {
+                    throw new Exception("Sign in To Get Your Courses");
+                }
+
+                // استدعاء الوظيفة المخزنة والحصول على الدورات
+                var courses = await _UnitOfWork.ExecuteTableValuedFunctionAsync<GetStudentCoursesResponseDto>("GetStudentCourses", UserId);
+
+                // إذا كانت هناك دورات، قم بإرجاعها
+                if (courses != null)
+                {
+                    return courses;
+                }
+
+                // إذا لم توجد دورات، قم بإرجاع قائمة فارغة
+                return new List<GetStudentCoursesResponseDto>();
+            }
+            catch (Exception)
+            {
 
 
+                throw;
+            }
+
+        }
     }
 }

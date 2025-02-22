@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Dtos.CourseDto.Request;
+using Codixa.Core.Dtos.SearchDtos;
 using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -167,6 +168,29 @@ namespace CodixaApi.Controllers
 
 
         //get Courses by search
+        [HttpPost("Search/{PageNumber}")]
+       
+        public async Task<IActionResult> Search(SearchCoursesDtos searchCoursesDtos, [FromRoute] int PageNumber)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Pass the token and DTO to the service class
+                    var (Courses, totalPages) = await _courseService.Search(searchCoursesDtos, PageNumber, 6);
+                    return Ok(new { Courses, totalPages });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Enter Page Number" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
 
     }
 }

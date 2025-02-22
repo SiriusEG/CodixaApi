@@ -82,7 +82,7 @@ namespace CodixaApi.Services
                 {
                     LessonName = lesson.LessonName,
                     IsVideo = lesson.IsVideo,
-                    VideoLink = lesson.Video.FilePath,
+                    VideoLink = file == null ?null:file.FilePath,
                     LessonText = lesson.LessonText,
                     LessonOrder = lesson.LessonOrder,
                     IsForpreview = lesson.IsForpreview
@@ -103,34 +103,22 @@ namespace CodixaApi.Services
 
         public async Task<string> DeleteLesson(DeleteLessonRequestDto deleteLessonRequestDto)
         {
-            // Update Lesson
-            try
-            {
-                try
-                {
-                    var Lesson = await _unitOfWork.Lessons.FirstOrDefaultAsync(x => x.LessonId == deleteLessonRequestDto.LessonId, x => x.Include(x => x.Video));
-                    if (Lesson == null)
-                    {
-                        throw new Exception("Lesson Not Found!");
-                    }
-                    await _unitOfWork.Lessons.DeleteAsync(Lesson);
-                    await _unitOfWork.Files.DeleteAsync(Lesson.Video);
-                    await _unitOfWork.Complete();
-                }
-                catch (Exception ex) { 
-                    throw new Exception(ex.Message);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("there are an error while Deleting Lesson " + ex.Message);
-            }
-
-
-
+           try
+           {
+               var Lesson = await _unitOfWork.Lessons.FirstOrDefaultAsync(x => x.LessonId == deleteLessonRequestDto.LessonId, x => x.Include(x => x.Video));
+               if (Lesson == null)
+               {
+                    throw new Exception("Lesson Not Found!");
+               }
+               await _unitOfWork.Lessons.DeleteAsync(Lesson);
+               if (Lesson.IsVideo) 
+                   await _unitOfWork.Files.DeleteAsync(Lesson.Video);
+               await _unitOfWork.Complete();
+           }
+           catch (Exception) { 
+               throw;
+           }
             return "Lesson Deleted Success";
-
         }
 
 

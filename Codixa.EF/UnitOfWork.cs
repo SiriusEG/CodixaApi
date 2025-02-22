@@ -80,7 +80,8 @@ namespace Codxia.EF
                 }
                 else
                 {
-                    return await _Context.Database.ExecuteSqlRawAsync(storedProcedure, parameters);
+                    var RowsEfficted =  await _Context.Database.ExecuteSqlRawAsync(storedProcedure, parameters);
+                    return RowsEfficted;
                 }
             }
             catch (Exception ex)
@@ -93,6 +94,56 @@ namespace Codxia.EF
               
                 return -1;
             }
+        }
+
+        public async Task<int> ExecuteStoredProcedureAsyncIntReturnScalar(string storedProcedure, params SqlParameter[] parameters)
+        {
+            try
+            {
+                using (var connection = _Context.Database.GetDbConnection())
+                {
+                    await connection.OpenAsync();
+
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = storedProcedure;
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (reader.Read())
+                            {
+                                // Get the first column value (which should be TotalUpdates)
+                                return reader.GetInt32(0);
+                            }
+                        }
+                    }
+                }
+
+                return 0; // In case no rows were returned
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
+        public async Task<List<T>> ExecuteTableValuedFunctionAsync<T>(string tvfName, params object[] parameters) where T : class
+        {
+            // بناء استعلام SELECT مع اسم الوظيفة والبارامترات
+            var sqlQuery = $"SELECT * FROM {tvfName}({string.Join(", ", Enumerable.Range(0, parameters.Length).Select(i => "@" + i))})";
+
+            // تحويل البارامترات إلى شكل يقبله FromSqlRaw
+            var parameterObjects = parameters.Select((p, i) => new SqlParameter($"@{i}", p)).ToArray();
+
+            return await _Context.Set<T>()
+                                 .FromSqlRaw(sqlQuery, parameterObjects)
+                                 .ToListAsync();
         }
 
         public async Task<(List<T> Results, int TotalCount)> ExecuteStoredProcedureWithCountAsync<T>(

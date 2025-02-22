@@ -24,7 +24,7 @@ namespace Codixa.Core.Models.CourseModels
         public virtual Section Section { get; set; }
         [ForeignKey(nameof(VideoId))]
         public virtual FileEntity Video { get; set; }
-
+        public virtual ICollection<LessonProgress> LessonProgresses { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
     }
 }

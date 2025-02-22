@@ -7,6 +7,7 @@ using Codixa.Core.Models.UserModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Codixa.Core.Custom_Exceptions;
+using Codixa.Core.Dtos.SearchDtos;
 
 namespace CodixaApi.Services
 {
@@ -230,6 +231,35 @@ namespace CodixaApi.Services
             return "Course Deleted Success";
 
         }
+
+        public async Task<(List<SearchCoursesResopnseDto> Courses, int PageCount)> Search(SearchCoursesDtos searchCoursesDtos, int PageNumber, int PageSize)
+        {
+         
+            try
+            {
+
+                if (searchCoursesDtos != null)
+                {
+                    var (result, totalCount) = await _unitOfWork.ExecuteStoredProcedureWithCountAsync<SearchCoursesResopnseDto>("SearchCourses",
+                        new SqlParameter("@CourseName", searchCoursesDtos.CourseName),
+                        new SqlParameter("@CourseDescription", searchCoursesDtos.CourseDescription),
+                        new SqlParameter("@CategoryId", searchCoursesDtos.CategoryId),
+                        new SqlParameter("@PageSize", PageSize),
+                        new SqlParameter("@PageNumber", PageNumber));
+                   
+                    return (result, totalCount);
+                }
+                throw new Exception("there are an error with Searching Filters");
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("there are an error while Searching Courses " + ex.Message);
+            }
+          
+        }
+
+
 
     }
 }

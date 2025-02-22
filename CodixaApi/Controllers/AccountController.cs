@@ -21,7 +21,6 @@ namespace CodixaApi.Controllers
 
 
         [HttpPost("RegisterNewStudent")]
-     
         public async Task<IActionResult> RegisterStudent([FromBody] RegisterStudentDto model)
         {
             if (!ModelState.IsValid)
@@ -50,7 +49,6 @@ namespace CodixaApi.Controllers
                 Errors = result.Errors
             });
         }
-
 
         [HttpPost("RegisterNewInstructor")]
         public async Task<IActionResult> RegisterInstructor([FromForm] RegisterInstructorDto model)
@@ -105,7 +103,6 @@ namespace CodixaApi.Controllers
                 });
             }
         }
-
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginUserDto userDto)

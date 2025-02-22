@@ -25,7 +25,7 @@ namespace CodixaApi.Controllers
         {
             try
             {
-                if (ModelState.IsValid) {
+                if (!ModelState.IsValid) {
                     return BadRequest("Lesson Info Is Empty");
                 }
                 var result = await _lessonService.addLesson(AddLessontDto);
@@ -52,7 +52,7 @@ namespace CodixaApi.Controllers
         {
             try
             {
-                if (ModelState == null)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest("Lesson Id Is Empty");
                 }
@@ -62,7 +62,7 @@ namespace CodixaApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return BadRequest(ex.Message);
             }
         }
 

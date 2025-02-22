@@ -119,8 +119,12 @@ namespace CodixaApi.Controllers
         {
             try
             {
-                var updatedSections = await _sectionService.UpdateSectionsAndLessonsAsync(sectionsToUpdate);
 
+                var updatedSections = await _sectionService.UpdateSectionsAndLessonsAsync(sectionsToUpdate);
+                if(updatedSections <= 0)
+                {
+                    return BadRequest(new { message = "There are an error while updating sections, lessons"});
+                }
                 return Ok(new { message = "Sections and lessons updated successfully."});
             }
             catch (Exception ex)

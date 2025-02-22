@@ -6,6 +6,7 @@ using Codixa.Core.Models.CourseModels;
 using Codxia.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Data;
 
 namespace CodixaApi.Services
@@ -29,9 +30,10 @@ namespace CodixaApi.Services
                 {
                     throw new InvalidDataEnteredException("Course Id is Null!");
                 }
+
                 var Secions = await _unitOfWork.Sections.GetListOfEntitiesByIdIncludesAsync(
-             s => s.CourseId == CourseId,  // Filter condition
-             query => query.Include(s => s.Lessons).ThenInclude(l => l.Video));
+                    s => s.CourseId == CourseId,  // Filter condition
+                    query => query.Include(s => s.Lessons).ThenInclude(l => l.Video));
 
                 List<AddSectionResponse> sectionResponse = Secions.Select(s => new AddSectionResponse
                 {
@@ -40,14 +42,15 @@ namespace CodixaApi.Services
                     SectionOrder = s.SectionOrder,
                     SectionContent = s.Lessons.Select(lesson => new AddSectionContentDto
                     {
+                        lessonId = lesson.LessonId,
                         LessonName = lesson.LessonName,
                         IsVideo = lesson.IsVideo,
                         VideoLink = lesson.IsVideo ? lesson.Video?.FilePath : null,
                         LessonText = lesson.IsVideo ? null : lesson.LessonText,
                         LessonOrder = lesson.LessonOrder,
                         IsForpreview = lesson.IsForpreview
-                    }).ToList()
-                }).ToList();
+                    }).OrderBy(lesson => lesson.LessonOrder).ToList() 
+                }).OrderBy(x => x.SectionOrder).ToList();
 
                 return sectionResponse;
             }
@@ -57,10 +60,10 @@ namespace CodixaApi.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("there are an error " + ex.Message);
+                throw new Exception("There was an error: " + ex.Message);
             }
-
         }
+
 
         public async Task<List<AddSectionResponse>> addSection(AddSectionRequestDto addSectionDto)
         {
@@ -99,8 +102,8 @@ namespace CodixaApi.Services
                         LessonText = lesson.IsVideo ? null : lesson.LessonText,
                         LessonOrder = lesson.LessonOrder,
                         IsForpreview = lesson.IsForpreview
-                    }).ToList()
-                }).ToList();
+                    }).OrderBy(lesson => lesson.LessonOrder).ToList()
+                }).OrderBy(x => x.SectionOrder).ToList();
 
                 return sectionResponse;
 
@@ -203,8 +206,8 @@ namespace CodixaApi.Services
                 {
                     sectionTable.Rows.Add(
                         section.SectionId,
-                        (object?)section.SectionOrder ?? DBNull.Value,
-                        (object?)section.SectionName ?? DBNull.Value
+                        section.SectionOrder,
+                        section.SectionName 
                     );
 
                     if (section.Lessons != null)
@@ -214,8 +217,8 @@ namespace CodixaApi.Services
                             lessonTable.Rows.Add(
                                 lesson.LessonId,
                                 section.SectionId,
-                                (object?)lesson.LessonOrder ?? DBNull.Value,
-                                (object?)lesson.LessonName ?? DBNull.Value
+                                lesson.LessonOrder,
+                                lesson.LessonName 
                             );
                         }
                     }
@@ -235,8 +238,8 @@ namespace CodixaApi.Services
                 };
 
                 // Execute Stored Procedure & Read Multiple Results
-                var updatedSections = await _unitOfWork.ExecuteStoredProcedureAsyncIntReturn(
-                    "UpdateSectionsAndLessons @SectionUpdates, @LessonUpdates", sectionParam, lessonParam
+                var updatedSections = await _unitOfWork.ExecuteStoredProcedureAsyncIntReturnScalar(
+                    "UpdateSectionsAndLessons", sectionParam, lessonParam
                 );
 
           

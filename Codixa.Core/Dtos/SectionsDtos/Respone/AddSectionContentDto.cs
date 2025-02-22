@@ -2,6 +2,7 @@
 {
     public class AddSectionContentDto
     {
+        public int lessonId { get; set; }
         public string LessonName { get; set; }
 
         public bool IsVideo { get; set; }

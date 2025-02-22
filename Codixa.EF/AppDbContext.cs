@@ -20,6 +20,8 @@ namespace Codxia.EF
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<courseFeedback> courseFeedbacks { get; set; }
+        public DbSet<LessonProgress> LessonProgress { get; set; }
+        public DbSet<CourseProgress> CourseProgress { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Lesson> Lessons { get; set; }

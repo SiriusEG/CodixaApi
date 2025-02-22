@@ -16,21 +16,16 @@ namespace Codixa.Core.Models.UserModels
         [Key]
         public int StudentId { get; set; }
         public string StudentFullName { get; set; }
-
-
-
         public string UserId { get; set; }
         [ForeignKey(nameof(UserId))]
-
         public virtual AppUser User { get; set; }
-
         public virtual ICollection<Enrollment> Enrollments { get; set; }
         public virtual ICollection<courseFeedback> courseFeedbacks { get; set; }
         public virtual ICollection<Certification> Certifications { get; set; }
         public virtual ICollection<UserAnswer> UserAnswers { get; set; }
         public virtual ICollection<TestResult> TestResults { get; set; }
-
         public virtual ICollection<CourseRequest> CourseRequests { get; set; }
+        public virtual ICollection<CourseProgress> StudentProgresses { get; set; }
 
     }
 }

@@ -38,6 +38,8 @@ namespace Codixa.Core.Models.CourseModels
         [ForeignKey(nameof(CourseCardPhotoId))]
         public virtual FileEntity Photo { get; set; }
 
+        public virtual ICollection<CourseProgress> StudentProgresses { get; set; }
+
 
     }
 }
