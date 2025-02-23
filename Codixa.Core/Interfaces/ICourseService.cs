@@ -14,6 +14,7 @@ namespace Codixa.Core.Interfaces
         Task<string> UpdateCourse(int CourseId, UpdateCourseRequestDto courseRequestDto);
         Task<(List<GetAllCoursesDetailsResponseDto> Courses, int PageCount)> GetUserCourses(string token, int PageNumber, int PageSize);
         Task<(List<SearchCoursesResopnseDto> Courses, int PageCount)> Search(SearchCoursesDtos searchCoursesDtos, int PageNumber, int PageSize);
+        Task<CourseDetailsResponseDto> GetCourseDetailsWithFeedbacksAsync(int courseId);
 
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
 using Codixa.Core.Models.sharedModels;
+using Codixa.Core.Models.StudentCourseModels;
 
 namespace Codixa.Core.Models.UserModels
 {

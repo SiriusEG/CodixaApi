@@ -13,6 +13,8 @@ namespace Codixa.Core.Models.CourseModels
         public int SectionOrder { get; set; }
 
         public bool IsFinished { get; set; }
+
+        public bool IsOpened { get; set; }
         public int CourseId { get; set; }
         [ForeignKey(nameof(CourseId))]
         public virtual Course Course { get; set; }

@@ -40,6 +40,7 @@ namespace CodxiaApi
             services.AddTransient<ILessonService, LessonService>();
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<IInstructorService, InstructorService>();
+            services.AddTransient<ICourseFeedbackService, CourseFeedbackService>();
 
          
        

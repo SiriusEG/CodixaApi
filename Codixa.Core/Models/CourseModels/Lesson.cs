@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Models.sharedModels;
+using Codixa.Core.Models.StudentCourseModels;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

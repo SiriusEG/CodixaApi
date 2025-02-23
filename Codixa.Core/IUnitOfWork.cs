@@ -19,6 +19,7 @@ namespace Codxia.Core
         IBaseRepository<CourseRequest> CourseRequests { get; }
         IBaseRepository<RefreshToken> RefreshTokens { get; }
         IBaseRepository<InstructorJoinRequest> InstructorJoinRequests { get; }
+        IBaseRepository<courseFeedback> courseFeedbacks { get; }
 
         IUserRepository UsersManger { get; }
         IFileRepository Files { get; }

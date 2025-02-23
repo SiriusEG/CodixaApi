@@ -31,6 +31,11 @@
     <Folder Include="wwwroot\uploads\CoursesVideos\" />
     <Folder Include="wwwroot\uploads\InstructorsCVs\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
   <!-- إضافة Web.config للنشر -->
   <ItemGroup>

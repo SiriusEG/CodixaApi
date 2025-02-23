@@ -32,6 +32,7 @@ namespace Codxia.EF
         public IBaseRepository<Course> Courses { get; private set; }
         public IBaseRepository<CourseRequest> CourseRequests { get; private set; }
         public IBaseRepository<Enrollment> Enrollments { get; private set; }
+        public IBaseRepository<courseFeedback> courseFeedbacks { get; private set; }
 
         public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
@@ -51,6 +52,7 @@ namespace Codxia.EF
             Lessons = new BaseRepository<Lesson>(_Context);
             CourseRequests = new BaseRepository<CourseRequest>(_Context);
             Enrollments = new BaseRepository<Enrollment>(_Context);
+            courseFeedbacks = new BaseRepository<courseFeedback>(_Context);
 
         }
 

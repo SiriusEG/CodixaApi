@@ -9,26 +9,14 @@ namespace Codixa.Core.Models.SectionsTestsModels
     {
         [Key]
         public int TestResultId { get; set; }
-
         public decimal Result { get; set; }
-
         public bool IsPassed { get; set; }
-
-
-
-
         public int StudentId { get; set; }
         [ForeignKey(nameof(StudentId))]
         public virtual Student Student { get; set; }
-
-
-
-
         public int SectionTestId { get; set; }
         [ForeignKey(nameof(SectionTestId))]
         public virtual SectionTest SectionTest { get; set; }
-
         public virtual Certification Certification { get; set; }
-
     }
 }

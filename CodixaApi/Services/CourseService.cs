@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.SearchDtos;
+using Codixa.Core.Dtos.FeedbackDto;
+using Codixa.Core.Enums;
+using System.Data;
+using Codxia.EF;
 
 namespace CodixaApi.Services
 {
@@ -16,10 +20,13 @@ namespace CodixaApi.Services
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IAuthenticationService _authenticationService;
-        public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
+        private readonly AppDbContext _Context;
+
+        public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,AppDbContext appDbContext)
         {
             _unitOfWork = unitOfWork;
             _authenticationService = authenticationService;
+            _Context = appDbContext;
         }
 
 
@@ -259,7 +266,82 @@ namespace CodixaApi.Services
           
         }
 
+        public async Task<CourseDetailsResponseDto> GetCourseDetailsWithFeedbacksAsync(int courseId)
+        {
+            CourseDetailsResponseDto courseDetailsResponse = null;
 
+            try
+            {
+                // Open the database connection
+                using var connection = new SqlConnection(_Context.Database.GetConnectionString());
+                await connection.OpenAsync();
+
+                // Create and configure the SQL command
+                using var command = connection.CreateCommand();
+                command.CommandText = "GetCourseDetailsWithFeedbacks";
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Add parameter for @CourseId
+                command.Parameters.Add(new SqlParameter("@CourseId", courseId));
+
+                // Execute the stored procedure and read the results
+                using var reader = await command.ExecuteReaderAsync();
+
+                // Initialize the response DTO
+                courseDetailsResponse = null;
+
+                // Read the first result set (course details)
+                if (await reader.ReadAsync())
+                {
+                    courseDetailsResponse = new CourseDetailsResponseDto
+                    {
+                        CourseName = reader["CourseName"]?.ToString() ?? string.Empty,
+                        CourseDescription = reader["CourseDescription"]?.ToString() ?? string.Empty,
+                        CourseCardPhotoPath = reader["CourseCardPhotoPath"]?.ToString() ?? string.Empty,
+                        CategoryName = reader["CategoryName"]?.ToString() ?? string.Empty,
+                        InsrtuctorName = reader["InstructorName"]?.ToString() ?? string.Empty,
+                        SectionCount = reader.IsDBNull(reader.GetOrdinal("SectionCount")) ? 0 : reader.GetInt32(reader.GetOrdinal("SectionCount")),
+                        TotalRate = (RateEnum)(reader.IsDBNull(reader.GetOrdinal("TotalRate")) ? 0 : reader.GetInt32(reader.GetOrdinal("TotalRate"))),
+                        Count5Stars = reader.IsDBNull(reader.GetOrdinal("Count5Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count5Stars")),
+                        Count4Stars = reader.IsDBNull(reader.GetOrdinal("Count4Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count4Stars")),
+                        Count3Stars = reader.IsDBNull(reader.GetOrdinal("Count3Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count3Stars")),
+                        Count2Stars = reader.IsDBNull(reader.GetOrdinal("Count2Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count2Stars")),
+                        Count1Star = reader.IsDBNull(reader.GetOrdinal("Count1Star")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count1Star")),
+                        FeedBacks = new List<FeedBackCourseDto>() 
+                    };
+                }
+
+                // Move to the second result set (feedbacks)
+                if (await reader.NextResultAsync())
+                {
+                    // Read the second result set (feedbacks) and populate the FeedBacks list
+                    while (await reader.ReadAsync())
+                    {
+                        courseDetailsResponse.FeedBacks.Add(new FeedBackCourseDto
+                        {
+                            Rate = (RateEnum)reader.GetInt32(reader.GetOrdinal("Rate")),
+                            Comment = reader.IsDBNull(reader.GetOrdinal("Comment")) ? string.Empty : reader.GetString(reader.GetOrdinal("Comment")),
+                            StudentFullName = reader["StudentFullName"]?.ToString() ?? string.Empty
+                        });
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw;
+            }
+            catch (InvalidOperationException ioEx)
+            {
+                throw; 
+            }
+            catch (Exception ex)
+            {
+                throw; 
+            }
+
+            // Return the result (or null if an error occurred)
+            return courseDetailsResponse;
+        }
 
     }
 }

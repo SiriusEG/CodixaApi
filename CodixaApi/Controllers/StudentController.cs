@@ -78,6 +78,7 @@ namespace CodixaApi.Controllers
         }
 
         //edit profile
+
         //changepassword
 
 

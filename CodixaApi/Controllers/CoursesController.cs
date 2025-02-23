@@ -132,7 +132,7 @@ namespace CodixaApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return BadRequest(new { Message = ex.Message });
             }
         }
 
@@ -153,7 +153,7 @@ namespace CodixaApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return BadRequest(new { Message = ex.Message });
             }
         }
 
@@ -165,7 +165,24 @@ namespace CodixaApi.Controllers
         //get All Cources
 
         //get course details
+        [HttpGet("CourseDetails/{CourseId}")]
+        public async Task<IActionResult> GetCourseDetailsWithFeedbacks([FromRoute] int CourseId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Course data Is Empty");
+                }
+                var result = await _courseService.GetCourseDetailsWithFeedbacksAsync(CourseId);
 
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
 
         //get Courses by search
         [HttpPost("Search/{PageNumber}")]

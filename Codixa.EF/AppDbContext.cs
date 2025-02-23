@@ -2,6 +2,7 @@
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
 using Codixa.Core.Models.sharedModels;
+using Codixa.Core.Models.StudentCourseModels;
 using Codixa.Core.Models.UserModels;
 using Codixa.EF.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace Codxia.EF
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<courseFeedback> courseFeedbacks { get; set; }
+        public DbSet<SectionProgress> SectionProgress { get; set; }
         public DbSet<LessonProgress> LessonProgress { get; set; }
         public DbSet<CourseProgress> CourseProgress { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
