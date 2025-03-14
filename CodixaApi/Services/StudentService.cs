@@ -104,5 +104,11 @@ namespace CodixaApi.Services
             }
 
         }
+
+        //enter lesson
+
+        //move to next lesson 
+
+
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Codixa.Core.Dtos.SectionsDtos.Request
+﻿using Codixa.Core.Enums;
+
+namespace Codixa.Core.Dtos.SectionsDtos.Request
 {
     public class AddSectionRequestDto
     {
@@ -8,5 +10,6 @@
 
         public int CourseId { get; set; }
 
+        public SectionTypeEnum SectionType { get; set; }
     }
 }

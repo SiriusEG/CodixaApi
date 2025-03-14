@@ -25,7 +25,7 @@ namespace CodixaApi.Services
 
                 string UserId = await _authenticationService.GetUserIdFromToken(token);
                 Student Student = await _unitOfWork.Students.FirstOrDefaultAsync(x=>x.UserId == UserId);
-                var FeedBack = _unitOfWork.courseFeedbacks.FirstOrDefaultAsync(x => x.StudentId == Student.StudentId && x.CourseId == CourseId);
+                var FeedBack = await _unitOfWork.courseFeedbacks.FirstOrDefaultAsync(x => x.StudentId == Student.StudentId && x.CourseId == CourseId);
                 if (FeedBack != null)
                 {
                     throw new Exception("You Have Added FeedBack");

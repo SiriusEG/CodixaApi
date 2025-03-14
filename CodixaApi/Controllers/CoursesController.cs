@@ -41,9 +41,6 @@ namespace CodixaApi.Controllers
 
         }
 
-
-
-
         [HttpGet("GetCoursesByUserToken/{PageNumber}")]
         [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> GetUserCourses([FromRoute]int PageNumber) {
@@ -66,8 +63,8 @@ namespace CodixaApi.Controllers
                     }
 
                     // Pass the token and DTO to the service class
-                    var (Courses, totalPages) = await _courseService.GetUserCourses(token, PageNumber, 6);
-                    return Ok(new { Courses, totalPages });
+                    var result = await _courseService.GetUserCourses(token, PageNumber, 6);
+                    return Ok(result);
                 }
                 else
                 {
@@ -186,7 +183,6 @@ namespace CodixaApi.Controllers
 
         //get Courses by search
         [HttpPost("Search/{PageNumber}")]
-       
         public async Task<IActionResult> Search(SearchCoursesDtos searchCoursesDtos, [FromRoute] int PageNumber)
         {
             try
@@ -194,8 +190,8 @@ namespace CodixaApi.Controllers
                 if (ModelState.IsValid)
                 {
                     // Pass the token and DTO to the service class
-                    var (Courses, totalPages) = await _courseService.Search(searchCoursesDtos, PageNumber, 6);
-                    return Ok(new { Courses, totalPages });
+                    var Result = await _courseService.Search(searchCoursesDtos, PageNumber, 6);
+                    return Ok(Result);
                 }
                 else
                 {

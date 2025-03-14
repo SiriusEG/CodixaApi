@@ -21,13 +21,11 @@ namespace CodixaApi.Controllers
 
 
         [HttpGet("GetInstructorsRequests/{PageNumber}")]
-        public async Task<IActionResult> GetAllInstructorsRequests([FromRoute]int PageNumber)
+        public async Task<IActionResult> GetAllInstructorsRequests([FromRoute] int PageNumber)
         {
-            var (result, Totalpages) = await _adminDashboardService.GetAllInstructors(10,PageNumber);
-            if (result == null&& Totalpages == 0) {
-                return BadRequest("No Data Has Found");
-            }
-            return Ok(new { result , Totalpages });
+            var result = await _adminDashboardService.GetAllInstructors(10, PageNumber);
+
+            return Ok(result);
         }
 
         [HttpGet("GetApprovedInstructors")]

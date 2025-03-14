@@ -1,5 +1,6 @@
 ﻿using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
+using Codixa.Core.Models.SectionsTestsModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -20,19 +21,22 @@ namespace Codxia.Core
         IBaseRepository<RefreshToken> RefreshTokens { get; }
         IBaseRepository<InstructorJoinRequest> InstructorJoinRequests { get; }
         IBaseRepository<courseFeedback> courseFeedbacks { get; }
+        IBaseRepository<ChoicesQuestion> ChoicesQuestions { get; }
+        IBaseRepository<UserAnswer> UserAnswers { get; }
+        IBaseRepository<TestResult> TestResults { get; }
+        IBaseRepository<SectionTest> SectionTests { get; }
+        IBaseRepository<Question> Questions { get; }
 
         IUserRepository UsersManger { get; }
         IFileRepository Files { get; }
         Task<List<T>> ExecuteStoredProcedureAsync<T>(string storedProcedure, params object[] parameters) where T : class;
         Task<int> ExecuteStoredProcedureAsyncIntReturn(string storedProcedure, params object[] parameters);
         Task<int> ExecuteStoredProcedureAsyncIntReturnScalar(string storedProcedure, params SqlParameter[] parameters);
+        Task<string> ExecuteStoredProcedureAsStringAsync(string storedProcedure, params object[] parameters);
 
         Task<List<T>> ExecuteTableValuedFunctionAsync<T>(string tvfName, params object[] parameters) where T : class;
 
-        Task<(List<T> Results, int TotalCount)> ExecuteStoredProcedureWithCountAsync<T>(
-        string storedProcedure, params object[] parameters) where T : class, new();
-
-    Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> Complete();
     }
 }

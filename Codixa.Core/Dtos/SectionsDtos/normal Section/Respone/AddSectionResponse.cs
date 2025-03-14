@@ -7,5 +7,7 @@
         public string SectionName { get; set; }
 
         public List<AddSectionContentDto>? SectionContent { get; set; }
+
+        public AddSectionTestContentDto? TestContent { get; set; }
     }
 }

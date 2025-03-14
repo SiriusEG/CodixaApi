@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Codixa.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,8 @@ namespace Codixa.Core.Dtos.SearchDtos
         public string? CourseName { get; set; }
         public string? CourseDescription { get; set; }
         public int? CategoryId { get; set; }
+        public CourseLevelEnum? Level { get; set; }
+
+        public CourseLangugeEnum? Language { get; set; }
     }
 }

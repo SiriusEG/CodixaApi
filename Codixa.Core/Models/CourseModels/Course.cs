@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Codixa.Core.Enums;
 using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.StudentCourseModels;
 using Codixa.Core.Models.UserModels;
@@ -17,11 +18,17 @@ namespace Codixa.Core.Models.CourseModels
 
         public string CourseCardPhotoId { get; set; }
 
+        public CourseLevelEnum Level { get; set; }
 
+        public CourseLangugeEnum Language { get; set; }
+
+        public int DurationTime { get; set; }
         public int CategoryId { get; set; }
 
         public bool IsDeleted { get; set; }
-    
+
+
+
         public int InstructorId { get; set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.SectionsDtos.Request;
+using Codixa.Core.Dtos.SectionsDtos.TestSection.request;
 using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace CodixaApi.Controllers
 
                 catch (Exception ex)
                 {
-                    return StatusCode(500,  ex);
+                    return StatusCode(500,  ex.Message);
                 }
             }
 
@@ -108,7 +109,7 @@ namespace CodixaApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -130,6 +131,26 @@ namespace CodixaApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while updating sections and lessons.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("AddTestSectionQuestions")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> AddTestSectionQuestions([FromBody] AddNewTestDto addNewTestDto)
+        {
+            try
+            {
+
+                var updatedSections = await _sectionService.AddTest(addNewTestDto);
+                if (updatedSections == "")
+                {
+                    return BadRequest(new { message = "There are an error while adding test section" });
+                }
+                return Ok(new { message = "test section added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while adding test section.", error = ex.Message });
             }
         }
 

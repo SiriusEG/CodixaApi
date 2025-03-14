@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.SearchDtos;
-using Codixa.Core.Dtos.FeedbackDto;
-using Codixa.Core.Enums;
 using System.Data;
 using Codxia.EF;
+using Codixa.Core.Dtos.CourseDto.CourseDetailsDtos;
+using System.Text.Json;
+
 
 namespace CodixaApi.Services
 {
@@ -45,7 +46,11 @@ namespace CodixaApi.Services
                     CourseName = Course.CourseName,
                     CourseDescription = Course.CourseDescription,
                     CourseCardPhotoFilePath = Course.Photo.FilePath,
-                    CategoryId = Course.CategoryId
+                    CategoryId = Course.CategoryId,
+                    IsPublished = Course.IsPublished,
+                    Level = Course.Level,
+                    Language = Course.Language
+
                 };
             }
             catch (Exception ex)
@@ -79,8 +84,11 @@ namespace CodixaApi.Services
                         IsPublished = false,
                         IsDeleted = false,
                         InstructorId = instructor.InstructorId,
-                        CategoryId=courseRequestDto.CategoryId
-                    });
+                        CategoryId=courseRequestDto.CategoryId,
+                        Level = courseRequestDto.Level,
+                        Language = courseRequestDto.Language
+
+                     });
                    
                     await _unitOfWork.Complete();
 
@@ -89,7 +97,9 @@ namespace CodixaApi.Services
                         CourseName= Course.CourseName,
                         CourseDescription= Course.CourseDescription,
                         CourseCardPhotoFilePath= file.FilePath,
-                        CategoryId = Course.CategoryId
+                        CategoryId = Course.CategoryId,
+                        Level = Course.Level,
+                        Language = Course.Language
                     };
             }
             catch (Exception ex) 
@@ -104,27 +114,48 @@ namespace CodixaApi.Services
 
 
         //get user courses
-        public async Task<(List<GetAllCoursesDetailsResponseDto> Courses,int PageCount)> GetUserCourses(string token,int PageNumber,int PageSize )
+        public async Task<GetAllCoursesDetailsResponseDto> GetUserCourses(string token,int PageNumber,int PageSize )
         {
+            GetAllCoursesDetailsResponseDto getAllCoursesDetailsResponseDto = null;
 
             try
             {
+                // Get the User ID from the token
                 var UserID = await _authenticationService.GetUserIdFromToken(token);
-                if (UserID != null) {
-                    var(result, totalCount) = await _unitOfWork.ExecuteStoredProcedureWithCountAsync<GetAllCoursesDetailsResponseDto>("GetCoursesByUserId", 
-                        new SqlParameter("@UserId", UserID),
-                        new SqlParameter("@PageNumber", PageNumber),
-                        new SqlParameter("@PageSize", PageSize));
-                    int totalPages = (int)Math.Ceiling((double)totalCount / PageSize);
-                    return (result, totalPages);
+
+                // Prepare parameters for the stored procedure
+                var jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                    "GetCoursesByUserId",
+                    "@UserId", UserID,
+                    "@PageSize", PageSize,
+                    "@PageNumber", PageNumber
+                );
+
+                // Check if JSON data is valid
+                if (!string.IsNullOrEmpty(jsonData))
+                {
+                    // Deserialize JSON into the response DTO
+                    getAllCoursesDetailsResponseDto = JsonSerializer.Deserialize<GetAllCoursesDetailsResponseDto>(jsonData);
                 }
-                throw new UserNotFoundException("Login To Get Your Courses!");
+                else
+                {
+                    throw new InvalidOperationException("The returned JSON is null or empty.");
+                }
             }
-            catch (UserNotFoundException) {
-                throw;
+            catch (JsonException jsonEx)
+            {
+                throw new Exception("Error while deserializing JSON data.", jsonEx);
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error occurred.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
             }
 
-
+            return getAllCoursesDetailsResponseDto;
         }
         //updateCourseDetails
 
@@ -159,6 +190,16 @@ namespace CodixaApi.Services
                 if (courseRequestDto.CategoryId.HasValue && courseRequestDto.CategoryId != 0)
                 {
                     OldCourse.CategoryId = courseRequestDto.CategoryId.Value;
+                }
+
+                if (courseRequestDto.Level.HasValue)
+                {
+                    OldCourse.Level = courseRequestDto.Level.Value;
+                }
+
+                if (courseRequestDto.Language.HasValue)
+                {
+                    OldCourse.Language = courseRequestDto.Language.Value;
                 }
 
                 // Handle file update (delete old file and upload new file)
@@ -239,107 +280,85 @@ namespace CodixaApi.Services
 
         }
 
-        public async Task<(List<SearchCoursesResopnseDto> Courses, int PageCount)> Search(SearchCoursesDtos searchCoursesDtos, int PageNumber, int PageSize)
+
+
+        public async Task<SearchCoursesResopnseDto> Search(SearchCoursesDtos searchCoursesDtos, int PageNumber, int PageSize)
         {
-         
+            SearchCoursesResopnseDto searchCoursesResopnseDto = null;
             try
             {
+                string jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                    "SearchCourses",
+                    "@CourseName", searchCoursesDtos.CourseName,
+                    "@CourseDescription", searchCoursesDtos.CourseDescription,
+                    "@CategoryId", searchCoursesDtos.CategoryId,
+                    "@Level", searchCoursesDtos.Level,
+                    "@Language", searchCoursesDtos.Language,
+                    "@PageSize", PageSize,
+                    "@PageNumber", PageNumber
+                );
 
-                if (searchCoursesDtos != null)
+                if (!string.IsNullOrEmpty(jsonData))
                 {
-                    var (result, totalCount) = await _unitOfWork.ExecuteStoredProcedureWithCountAsync<SearchCoursesResopnseDto>("SearchCourses",
-                        new SqlParameter("@CourseName", searchCoursesDtos.CourseName),
-                        new SqlParameter("@CourseDescription", searchCoursesDtos.CourseDescription),
-                        new SqlParameter("@CategoryId", searchCoursesDtos.CategoryId),
-                        new SqlParameter("@PageSize", PageSize),
-                        new SqlParameter("@PageNumber", PageNumber));
-                   
-                    return (result, totalCount);
-                }
-                throw new Exception("there are an error with Searching Filters");
+                    // Deserialize JSON if needed
+                     searchCoursesResopnseDto = JsonSerializer.Deserialize<SearchCoursesResopnseDto>(jsonData);
 
+                    // Process the response
+                    return searchCoursesResopnseDto;
+                }
+            }
+            catch (JsonException jsonEx)
+            {
+                throw new Exception("Error while deserializing JSON data.", jsonEx);
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error occurred.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("there are an error while Searching Courses " + ex.Message);
+                throw new Exception("An unexpected error occurred.", ex);
             }
-          
+  
+            return searchCoursesResopnseDto;
         }
-
+            
         public async Task<CourseDetailsResponseDto> GetCourseDetailsWithFeedbacksAsync(int courseId)
         {
             CourseDetailsResponseDto courseDetailsResponse = null;
 
             try
             {
-                // Open the database connection
-                using var connection = new SqlConnection(_Context.Database.GetConnectionString());
-                await connection.OpenAsync();
+                // Execute the stored procedure and retrieve JSON data
+                var jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                    "GetCourseDetailsWithFeedbacks",
+                    "@CourseId", courseId
+                );
 
-                // Create and configure the SQL command
-                using var command = connection.CreateCommand();
-                command.CommandText = "GetCourseDetailsWithFeedbacks";
-                command.CommandType = CommandType.StoredProcedure;
-
-                // Add parameter for @CourseId
-                command.Parameters.Add(new SqlParameter("@CourseId", courseId));
-
-                // Execute the stored procedure and read the results
-                using var reader = await command.ExecuteReaderAsync();
-
-                // Initialize the response DTO
-                courseDetailsResponse = null;
-
-                // Read the first result set (course details)
-                if (await reader.ReadAsync())
+                // Check if JSON data is valid
+                if (!string.IsNullOrEmpty(jsonData))
                 {
-                    courseDetailsResponse = new CourseDetailsResponseDto
-                    {
-                        CourseName = reader["CourseName"]?.ToString() ?? string.Empty,
-                        CourseDescription = reader["CourseDescription"]?.ToString() ?? string.Empty,
-                        CourseCardPhotoPath = reader["CourseCardPhotoPath"]?.ToString() ?? string.Empty,
-                        CategoryName = reader["CategoryName"]?.ToString() ?? string.Empty,
-                        InsrtuctorName = reader["InstructorName"]?.ToString() ?? string.Empty,
-                        SectionCount = reader.IsDBNull(reader.GetOrdinal("SectionCount")) ? 0 : reader.GetInt32(reader.GetOrdinal("SectionCount")),
-                        TotalRate = (RateEnum)(reader.IsDBNull(reader.GetOrdinal("TotalRate")) ? 0 : reader.GetInt32(reader.GetOrdinal("TotalRate"))),
-                        Count5Stars = reader.IsDBNull(reader.GetOrdinal("Count5Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count5Stars")),
-                        Count4Stars = reader.IsDBNull(reader.GetOrdinal("Count4Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count4Stars")),
-                        Count3Stars = reader.IsDBNull(reader.GetOrdinal("Count3Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count3Stars")),
-                        Count2Stars = reader.IsDBNull(reader.GetOrdinal("Count2Stars")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count2Stars")),
-                        Count1Star = reader.IsDBNull(reader.GetOrdinal("Count1Star")) ? 0 : reader.GetInt32(reader.GetOrdinal("Count1Star")),
-                        FeedBacks = new List<FeedBackCourseDto>() 
-                    };
+                    // Deserialize JSON into the response DTO
+                    courseDetailsResponse = JsonSerializer.Deserialize<CourseDetailsResponseDto>(jsonData);
                 }
-
-                // Move to the second result set (feedbacks)
-                if (await reader.NextResultAsync())
+                else
                 {
-                    // Read the second result set (feedbacks) and populate the FeedBacks list
-                    while (await reader.ReadAsync())
-                    {
-                        courseDetailsResponse.FeedBacks.Add(new FeedBackCourseDto
-                        {
-                            Rate = (RateEnum)reader.GetInt32(reader.GetOrdinal("Rate")),
-                            Comment = reader.IsDBNull(reader.GetOrdinal("Comment")) ? string.Empty : reader.GetString(reader.GetOrdinal("Comment")),
-                            StudentFullName = reader["StudentFullName"]?.ToString() ?? string.Empty
-                        });
-                    }
+                    throw new InvalidOperationException("The returned JSON is null or empty.");
                 }
+            }
+            catch (JsonException jsonEx)
+            {
+                throw new Exception("Error while deserializing JSON data.", jsonEx);
             }
             catch (SqlException sqlEx)
             {
-                throw;
-            }
-            catch (InvalidOperationException ioEx)
-            {
-                throw; 
+                throw new Exception("Database error occurred.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw; 
+                throw new Exception("An unexpected error occurred.", ex);
             }
 
-            // Return the result (or null if an error occurred)
             return courseDetailsResponse;
         }
 

@@ -12,6 +12,7 @@ using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Models.CourseModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Codixa.Core.Models.SectionsTestsModels;
 
 namespace Codxia.EF
 {
@@ -33,6 +34,11 @@ namespace Codxia.EF
         public IBaseRepository<CourseRequest> CourseRequests { get; private set; }
         public IBaseRepository<Enrollment> Enrollments { get; private set; }
         public IBaseRepository<courseFeedback> courseFeedbacks { get; private set; }
+        public IBaseRepository<ChoicesQuestion> ChoicesQuestions { get; private set; }
+        public IBaseRepository<UserAnswer> UserAnswers { get; private set; }
+        public IBaseRepository<TestResult> TestResults { get; private set; }
+        public IBaseRepository<SectionTest> SectionTests { get; private set; }
+        public IBaseRepository<Question> Questions { get; private set; }
 
         public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
@@ -53,6 +59,11 @@ namespace Codxia.EF
             CourseRequests = new BaseRepository<CourseRequest>(_Context);
             Enrollments = new BaseRepository<Enrollment>(_Context);
             courseFeedbacks = new BaseRepository<courseFeedback>(_Context);
+            ChoicesQuestions = new BaseRepository<ChoicesQuestion>(_Context);
+            UserAnswers = new BaseRepository<UserAnswer>(_Context);
+            TestResults = new BaseRepository<TestResult>(_Context);
+            SectionTests = new BaseRepository<SectionTest>(_Context);
+            Questions = new BaseRepository<Question>(_Context);
 
         }
 
@@ -95,6 +106,64 @@ namespace Codxia.EF
 
               
                 return -1;
+            }
+        }
+
+        public async Task<string> ExecuteStoredProcedureAsStringAsync(string storedProcedure, params object[] parameters)
+        {
+            try
+            {
+                if (parameters.Length % 2 != 0)
+                {
+                    throw new ArgumentException("Parameters must be provided in key-value pairs.");
+                }
+
+                using var connection = new SqlConnection(_Context.Database.GetConnectionString());
+                await connection.OpenAsync();
+
+                using var command = connection.CreateCommand();
+                command.CommandText = storedProcedure;
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Add parameters dynamically
+                for (int i = 0; i < parameters.Length; i += 2)
+                {
+                    string paramName = parameters[i]?.ToString();
+                    object paramValue = parameters[i + 1];
+
+                    if (string.IsNullOrEmpty(paramName))
+                    {
+                        throw new ArgumentException("Parameter name cannot be null or empty.");
+                    }
+
+                    var sqlParam = new SqlParameter(paramName, paramValue ?? (object)DBNull.Value);
+                    command.Parameters.Add(sqlParam);
+                }
+
+                // Execute the stored procedure and read the result
+                using var reader = await command.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    string jsonData = reader[0]?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(jsonData))
+                    {
+                        throw new InvalidOperationException("The returned JSON is null or empty.");
+                    }
+
+                    return jsonData; // Return raw JSON string
+                }
+
+                return null; // No data returned
+            }
+            catch (SqlException sqlEx)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
 
@@ -146,57 +215,6 @@ namespace Codxia.EF
             return await _Context.Set<T>()
                                  .FromSqlRaw(sqlQuery, parameterObjects)
                                  .ToListAsync();
-        }
-
-        public async Task<(List<T> Results, int TotalCount)> ExecuteStoredProcedureWithCountAsync<T>(
-    string storedProcedure, params object[] parameters) where T : class, new()
-        {
-            using var connection = new SqlConnection(_Context.Database.GetConnectionString()); // Open connection
-            await connection.OpenAsync();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = storedProcedure;
-            command.CommandType = CommandType.StoredProcedure;
-
-            foreach (var param in parameters)
-            {
-                if (param is SqlParameter sqlParam)
-                    command.Parameters.Add(sqlParam);
-            }
-
-            using var reader = await command.ExecuteReaderAsync(); // Execute the stored procedure
-
-            // Read the total count (first result set)
-            int totalCount = 0;
-            if (await reader.ReadAsync())
-            {
-                totalCount = reader.GetInt32(0); // ✅ Read total count from first row
-            }
-
-            // ✅ Move to the second result set (paginated courses)
-            if (await reader.NextResultAsync())
-            {
-                var results = new List<T>();
-                var properties = typeof(T).GetProperties();
-
-                while (await reader.ReadAsync())
-                {
-                    var obj = Activator.CreateInstance<T>();
-
-                    foreach (var prop in properties)
-                    {
-                        var value = reader[prop.Name];
-                        if (value != DBNull.Value)
-                        {
-                            prop.SetValue(obj, value);
-                        }
-                    }
-                    results.Add(obj);
-                }
-
-                return (results, totalCount); // ✅ Return both paginated courses & total count
-            }
-            return (new List<T>(), totalCount);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

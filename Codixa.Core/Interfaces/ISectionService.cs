@@ -1,5 +1,6 @@
 ﻿using Codixa.Core.Dtos.SectionsDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.Respone;
+using Codixa.Core.Dtos.SectionsDtos.TestSection.request;
 
 namespace Codixa.Core.Interfaces
 {
@@ -10,5 +11,6 @@ namespace Codixa.Core.Interfaces
        Task<string> DeleteSection(DeleteSectionRequestDto deleteSectionRequestDto);
        Task<UpdateSectionNameResDto> UpdateSectionName(UpdateSectionNameReqDto updateSectionNameReqDto);
        Task<int> UpdateSectionsAndLessonsAsync(List<UpdateSectionLessonNameOrderdto> sectionsToUpdate);
+       Task<string> AddTest(AddNewTestDto addNewTestDto);
     }
 }

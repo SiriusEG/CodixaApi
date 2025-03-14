@@ -65,8 +65,24 @@ namespace Codxia.EF.Repositories
 
             // Apply the filter and get the first result
             return await query.FirstOrDefaultAsync(keySelector);
+        }
 
+        public async Task<List<T>> GetEntitesListBy(Expression<Func<T, bool>> keySelector,
+        params Func<IQueryable<T>, IQueryable<T>>[] includes)
+        {
+            IQueryable<T> query = _Context.Set<T>();
 
+            // Apply includes if they are provided
+            if (includes != null && includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = include(query);
+                }
+            }
+
+            // Apply the filter and get the first result
+            return await query.Where(keySelector).ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int take, int skip)

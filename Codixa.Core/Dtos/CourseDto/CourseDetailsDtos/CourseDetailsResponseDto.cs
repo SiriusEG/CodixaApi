@@ -1,7 +1,7 @@
 ﻿using Codixa.Core.Dtos.FeedbackDto;
 using Codixa.Core.Enums;
 
-namespace Codixa.Core.Dtos.CourseDto.Response
+namespace Codixa.Core.Dtos.CourseDto.CourseDetailsDtos
 {
     public class CourseDetailsResponseDto
     {
@@ -18,8 +18,9 @@ namespace Codixa.Core.Dtos.CourseDto.Response
         public int Count3Stars { get; set; }
         public int Count2Stars { get; set; }
         public int Count1Star { get; set; }
-
+       
         public List<FeedBackCourseDto> FeedBacks { get; set; }
+        public List<SectionsCourseDetailsDto> Sections { get; set; }
 
     }
 }

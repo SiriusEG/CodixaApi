@@ -2,11 +2,13 @@
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.response;
+using Codixa.Core.Dtos.SearchDtos;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
+using System.Text.Json;
 
 namespace CodixaApi.Services
 {
@@ -17,12 +19,40 @@ namespace CodixaApi.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<(List<ReturnAllInstructorsReqDto> Instructors,int PageCount)> GetAllInstructors(int pagesize,int pagenumber)
+        public async Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber)
         {
-            var (result, totalCount) =await _unitOfWork.ExecuteStoredProcedureWithCountAsync<ReturnAllInstructorsReqDto>("ShowAllInstructorRequest",
-                   new SqlParameter("@PageSize", pagesize),
-                   new SqlParameter("@PageNumber", pagenumber));
-            return (result, totalCount);
+            ReturnAllInstructorsReqDto ReturnAllInstructorsReqDto = null;
+            try
+            {
+                string jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                "ShowAllInstructorRequest",
+                    "@PageSize", pagesize,
+                    "@PageNumber", pagenumber
+                );
+
+                if (!string.IsNullOrEmpty(jsonData))
+                {
+                    // Deserialize JSON if needed
+                    ReturnAllInstructorsReqDto = JsonSerializer.Deserialize<ReturnAllInstructorsReqDto>(jsonData);
+
+                    // Process the response
+                    return ReturnAllInstructorsReqDto;
+                }
+            }
+            catch (JsonException jsonEx)
+            {
+                throw new Exception("Error while deserializing JSON data.", jsonEx);
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error occurred.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+
+            return ReturnAllInstructorsReqDto;
         }
 
         public async Task<int> ChangeInstructorRequestStatus(ChangeInstructorRequestStatusDto requestStatusDto)

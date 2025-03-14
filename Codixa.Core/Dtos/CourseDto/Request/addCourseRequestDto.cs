@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Codixa.Core.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace Codixa.Core.Dtos.CourseDto.Request
 {
@@ -13,7 +14,9 @@ namespace Codixa.Core.Dtos.CourseDto.Request
 
         public IFormFile CourseCardPhoto { get; set; }
 
-       
+        public CourseLevelEnum Level { get; set; }
+
+        public CourseLangugeEnum Language { get; set; }
 
     }
 }

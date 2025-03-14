@@ -1,4 +1,5 @@
-﻿using Codixa.Core.Models.SectionsTestsModels;
+﻿using Codixa.Core.Enums;
+using Codixa.Core.Models.SectionsTestsModels;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +13,7 @@ namespace Codixa.Core.Models.CourseModels
 
         public int SectionOrder { get; set; }
 
-        public bool IsFinished { get; set; }
+        public SectionTypeEnum SectionType { get; set; }
 
         public bool IsOpened { get; set; }
         public int CourseId { get; set; }
