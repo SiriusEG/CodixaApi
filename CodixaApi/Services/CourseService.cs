@@ -21,13 +21,13 @@ namespace CodixaApi.Services
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IAuthenticationService _authenticationService;
-        private readonly AppDbContext _Context;
+        
 
-        public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,AppDbContext appDbContext)
+        public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
         {
             _unitOfWork = unitOfWork;
             _authenticationService = authenticationService;
-            _Context = appDbContext;
+           
         }
 
 
