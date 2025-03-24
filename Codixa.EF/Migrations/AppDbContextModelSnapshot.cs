@@ -235,7 +235,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Comment", b =>
@@ -263,7 +263,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Course", b =>
@@ -289,6 +289,9 @@ namespace Codixa.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DurationTime")
+                        .HasColumnType("int");
+
                     b.Property<int>("InstructorId")
                         .HasColumnType("int");
 
@@ -298,6 +301,12 @@ namespace Codixa.EF.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
                     b.HasKey("CourseId");
 
                     b.HasIndex("CategoryId");
@@ -306,7 +315,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.CourseRequest", b =>
@@ -344,7 +353,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("CourseRequests");
+                    b.ToTable("CourseRequests", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Enrollment", b =>
@@ -370,7 +379,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Enrollments");
+                    b.ToTable("Enrollments", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Lesson", b =>
@@ -409,7 +418,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("VideoId");
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Section", b =>
@@ -423,9 +432,6 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsFinished")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsOpened")
                         .HasColumnType("bit");
 
@@ -436,11 +442,14 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("SectionOrder")
                         .HasColumnType("int");
 
+                    b.Property<int>("SectionType")
+                        .HasColumnType("int");
+
                     b.HasKey("SectionId");
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Sections");
+                    b.ToTable("Sections", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.courseFeedback", b =>
@@ -472,7 +481,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("courseFeedbacks");
+                    b.ToTable("courseFeedbacks", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.SectionsTestsModels.ChoicesQuestion", b =>
@@ -497,7 +506,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("ChoicesQuestions");
+                    b.ToTable("ChoicesQuestions", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.SectionsTestsModels.Question", b =>
@@ -519,7 +528,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("SectionTestId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.SectionsTestsModels.SectionTest", b =>
@@ -533,12 +542,15 @@ namespace Codixa.EF.Migrations
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("SuccessResult")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("SectionTestId");
 
                     b.HasIndex("SectionId")
                         .IsUnique();
 
-                    b.ToTable("SectionTests");
+                    b.ToTable("SectionTests", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.SectionsTestsModels.TestResult", b =>
@@ -567,7 +579,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("TestResults");
+                    b.ToTable("TestResults", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.SectionsTestsModels.UserAnswer", b =>
@@ -595,7 +607,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("UserAnswers");
+                    b.ToTable("UserAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.StudentCourseModels.CourseProgress", b =>
@@ -624,7 +636,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("CourseProgress");
+                    b.ToTable("CourseProgress", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.StudentCourseModels.LessonProgress", b =>
@@ -650,7 +662,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("LessonProgress");
+                    b.ToTable("LessonProgress", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.StudentCourseModels.SectionProgress", b =>
@@ -662,9 +674,6 @@ namespace Codixa.EF.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOpened")
                         .HasColumnType("bit");
 
                     b.Property<int>("SectionId")
@@ -679,7 +688,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("SectionProgress");
+                    b.ToTable("SectionProgress", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.AppUser", b =>
@@ -784,7 +793,7 @@ namespace Codixa.EF.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Instructors");
+                    b.ToTable("Instructors", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.InstructorJoinRequest", b =>
@@ -827,7 +836,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InstructorJoinRequests");
+                    b.ToTable("InstructorJoinRequests", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.RefreshToken", b =>
@@ -856,7 +865,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.Student", b =>
@@ -880,7 +889,7 @@ namespace Codixa.EF.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.sharedModels.Certification", b =>
@@ -904,7 +913,7 @@ namespace Codixa.EF.Migrations
                     b.HasIndex("TestResultId")
                         .IsUnique();
 
-                    b.ToTable("Certifications");
+                    b.ToTable("Certifications", (string)null);
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.sharedModels.FileEntity", b =>
@@ -922,7 +931,7 @@ namespace Codixa.EF.Migrations
 
                     b.HasKey("FileId");
 
-                    b.ToTable("Files");
+                    b.ToTable("Files", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -954,19 +963,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "ed877709-b4f7-47db-b82d-3fdee98916e3",
+                            Id = "8723cbb2-fb81-4cc5-9b3a-20cb5efe7c6e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "5f95ce20-9994-4093-9979-2cc425c7af96",
+                            Id = "8a91ad9d-dc22-434d-99d2-9c87efdb5856",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "1c829712-c438-45b6-a0fd-1c1b6de160b1",
+                            Id = "7f2ffc7f-f9bf-4816-8f2d-33f9cce3677e",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });

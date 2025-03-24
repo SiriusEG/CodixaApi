@@ -1,6 +1,7 @@
 ﻿using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.StudentCourseModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -26,6 +27,9 @@ namespace Codxia.Core
         IBaseRepository<TestResult> TestResults { get; }
         IBaseRepository<SectionTest> SectionTests { get; }
         IBaseRepository<Question> Questions { get; }
+        IBaseRepository<SectionProgress> SectionProgress { get; }
+        IBaseRepository<LessonProgress> LessonProgress { get; }
+        IBaseRepository<CourseProgress> CourseProgress { get; }
 
         IUserRepository UsersManger { get; }
         IFileRepository Files { get; }

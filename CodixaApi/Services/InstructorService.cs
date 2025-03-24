@@ -3,6 +3,7 @@ using Codixa.Core.Dtos.InstructorDtos.Request;
 using Codixa.Core.Enums;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
+using Codixa.Core.Models.StudentCourseModels;
 using Codxia.Core;
 using Codxia.EF;
 using Microsoft.EntityFrameworkCore;
@@ -116,21 +117,50 @@ namespace CodixaApi.Services
                         await _UnitOfWork.Complete();
                         result = "Student Rejected";
                         break;
-
                     case RequestStatusEnum.Accepted:
                         Request.ReviewDate = DateTime.Now;
                         Request.ReviewedBy = instructorId;
                         Request.RequestStatus = RequestStatusEnum.Accepted.ToString();
-                        await _UnitOfWork.CourseRequests.UpdateAsync(Request);
-                        await _UnitOfWork.Enrollments.AddAsync(new Enrollment
+
+                        var enrollment = new Enrollment
                         {
                             CourseId = Request.CourseId,
                             StudentId = Request.StudentId,
                             EnrollmentDate = DateTime.Now
-                        });
+                        };
+
+                        var courseProgress = new CourseProgress
+                        {
+                            StudentId = Request.StudentId,
+                            CourseId = Request.CourseId,
+                            ProgressPercentage = 0.0
+                        };
+
+                        var section = await _UnitOfWork.Sections.FirstOrDefaultAsync(x => x.SectionOrder == 1 && x.CourseId == Request.CourseId);
+                        var lesson = section != null
+                            ? await _UnitOfWork.Lessons.FirstOrDefaultAsync(x => x.LessonOrder == 1 && x.SectionId == section.SectionId)
+                            : null;
+
+                        var lessonProgress = lesson != null
+                            ? new LessonProgress { StudentId = Request.StudentId, LessonId = lesson.LessonId }
+                            : null;
+
+                        var sectionProgress = section != null
+                            ? new SectionProgress { StudentId = Request.StudentId, SectionId = section.SectionId }
+                            : null;
+
+                        await Task.WhenAll(
+                            _UnitOfWork.CourseRequests.UpdateAsync(Request),
+                            _UnitOfWork.Enrollments.AddAsync(enrollment),
+                            _UnitOfWork.CourseProgress.AddAsync(courseProgress),
+                            lessonProgress != null ? _UnitOfWork.LessonProgress.AddAsync(lessonProgress) : Task.CompletedTask,
+                            sectionProgress != null ? _UnitOfWork.SectionProgress.AddAsync(sectionProgress) : Task.CompletedTask
+                        );
+
                         await _UnitOfWork.Complete();
                         result = "Student Accepted";
                         break;
+
                 }
 
                 return result;

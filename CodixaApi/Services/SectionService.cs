@@ -51,7 +51,7 @@ namespace CodixaApi.Services
                         SectionId = s.SectionId,
                         SectionName = s.SectionName,
                         SectionOrder = s.SectionOrder,
-
+                        SectionType = s.SectionType,
                         // Populate SectionContent if SectionType is "Section"
                         SectionContent = s.SectionType == SectionTypeEnum.Section && s.Lessons != null
                             ? s.Lessons.Select(lesson => new AddSectionContentDto
@@ -139,27 +139,26 @@ namespace CodixaApi.Services
                     SectionId = s.SectionId,
                     SectionName = s.SectionName,
                     SectionOrder = s.SectionOrder,
+                    SectionType=s.SectionType,
+                    SectionContent = s.SectionType == SectionTypeEnum.Section && s.Lessons != null
+                    ? s.Lessons.Select(lesson => new AddSectionContentDto
+                     {
+                         LessonName = lesson.LessonName,
+                         IsVideo = lesson.IsVideo,
+                         VideoLink = lesson.IsVideo && lesson.Video != null ? lesson.Video.FilePath : null,
+                         LessonText = lesson.IsVideo ? null : lesson.LessonText,
+                         LessonOrder = lesson.LessonOrder,
+                         IsForpreview = lesson.IsForpreview
+                     }).OrderBy(lesson => lesson.LessonOrder).ToList()
+                     : null,
 
-
-                    SectionContent = s.SectionType == SectionTypeEnum.Section
-                        ? s.Lessons.Select(lesson => new AddSectionContentDto
-                        {
-                            LessonName = lesson.LessonName,
-                            IsVideo = lesson.IsVideo,
-                            VideoLink = lesson.IsVideo ? lesson.Video?.FilePath : null,
-                            LessonText = lesson.IsVideo ? null : lesson.LessonText,
-                            LessonOrder = lesson.LessonOrder,
-                            IsForpreview = lesson.IsForpreview
-                        }).OrderBy(lesson => lesson.LessonOrder).ToList()
-                        : null,
-
-                    TestContent = s.SectionType == SectionTypeEnum.Test
-                        ? new AddSectionTestContentDto
-                        {
-                            SectionTestId = s.SectionTest.SectionTestId,
-                            SuccessResult = s.SectionTest.SuccessResult
-                        }
-                        : null
+                    TestContent = s.SectionType == SectionTypeEnum.Test && s.SectionTest != null
+                    ? new AddSectionTestContentDto
+                    {
+                        SectionTestId = s.SectionTest.SectionTestId,
+                        SuccessResult = s.SectionTest.SuccessResult
+                    }
+                    : null
 
                 }).OrderBy(x => x.SectionOrder).ToList();
 

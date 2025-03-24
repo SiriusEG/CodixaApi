@@ -18,6 +18,10 @@ namespace Codixa.Core.Models.StudentCourseModels
         [ForeignKey(nameof(LessonId))]
         public virtual Lesson Lesson { get; set; }
 
+        public int SectionId { get; set; }
+        [ForeignKey(nameof(SectionId))]
+        public virtual Section Section { get; set; }
+
         public bool IsCompleted { get; set; }
 
     }

@@ -13,6 +13,7 @@ using Codixa.Core.Models.CourseModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.StudentCourseModels;
 
 namespace Codxia.EF
 {
@@ -39,6 +40,9 @@ namespace Codxia.EF
         public IBaseRepository<TestResult> TestResults { get; private set; }
         public IBaseRepository<SectionTest> SectionTests { get; private set; }
         public IBaseRepository<Question> Questions { get; private set; }
+        public IBaseRepository<SectionProgress> SectionProgress { get; private set; }
+        public IBaseRepository<LessonProgress> LessonProgress { get; private set; }
+        public IBaseRepository<CourseProgress> CourseProgress { get; private set; }
 
         public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
@@ -64,6 +68,9 @@ namespace Codxia.EF
             TestResults = new BaseRepository<TestResult>(_Context);
             SectionTests = new BaseRepository<SectionTest>(_Context);
             Questions = new BaseRepository<Question>(_Context);
+            SectionProgress = new BaseRepository<SectionProgress>(_Context);
+            LessonProgress = new BaseRepository<LessonProgress>(_Context);
+            CourseProgress = new BaseRepository<CourseProgress>(_Context);
 
         }
 
