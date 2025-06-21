@@ -7,5 +7,6 @@ namespace Codixa.Core.Interfaces
     {
         Task<CourseDataDto> GetCourseContent(int CourseId);
         Task<string> GetLessonDetails(GetLessonDetailsDto getLessonDetailsDto, string token);
+        Task<string> MarkLessonAsCompleted(int LessonId, string token);
     }
 }

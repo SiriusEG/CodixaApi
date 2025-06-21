@@ -6,6 +6,7 @@ using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -27,12 +28,26 @@ namespace CodixaApi.Services
 
         public async Task<IdentityResult> RegisterStudentAsync(RegisterStudentDto model)
         {
+            FileEntity file = new FileEntity();
+            if (model.Photo != null)
+            {
+
+                file = await _unitOfWork.Files.UploadFileAsync(model.Photo, Path.Combine("uploads", "UsersPics"));
+                await _unitOfWork.Files.AddAsync(file);
+                await _unitOfWork.Complete();
+            }
+      
+            
+
             var user = new AppUser {
                 UserName = model.UserName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Gender = model.Gender,
-                DateOfBirth = model.DateOfBirth };
+                DateOfBirth = model.DateOfBirth ,
+                PhotoId = file.FileId
+            
+            };
             // Create the user
             var result = await _unitOfWork.UsersManger.CreateAsync(user, model.Password);
 
@@ -68,6 +83,15 @@ namespace CodixaApi.Services
             {
                 // Step 1: Upload the file
                 FileEntity file = null;
+                FileEntity Photo = new FileEntity();
+                if (model.Photo != null)
+                {
+
+                    Photo = await _unitOfWork.Files.UploadFileAsync(model.Photo, Path.Combine("uploads", "UsersPics"));
+                    await _unitOfWork.Files.AddAsync(Photo);
+                    await _unitOfWork.Complete();
+                }
+
                 try
                 {
                     file = await _unitOfWork.Files.UploadFileAsync(model.Cv, Path.Combine("uploads", "InstructorsCVs"));
@@ -90,7 +114,8 @@ namespace CodixaApi.Services
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                     Gender = model.Gender,
-                    DateOfBirth = model.DateOfBirth
+                    DateOfBirth = model.DateOfBirth,
+                    PhotoId = Photo.FileId
                 };
 
                 var result = await _unitOfWork.UsersManger.CreateAsync(user, model.Password);
@@ -225,7 +250,7 @@ namespace CodixaApi.Services
         private async Task<string> GenerateJwtToken(string userId)
         {
 
-            var User = await _unitOfWork.UsersManger.FindByIdAsync(userId);
+            var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(x=>x.Id == userId, includes=>includes.Include(c=>c.Photo));
 
 
             var roles = await _unitOfWork.UsersManger.GetRolesAsync(User);
@@ -237,6 +262,7 @@ namespace CodixaApi.Services
                 new Claim(ClaimTypes.Name, User.UserName),
                 new Claim(ClaimTypes.NameIdentifier, User.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("ProfilePicturePath", User.Photo == null ? "null" : User.Photo.FilePath.ToString()) 
 
             };
 

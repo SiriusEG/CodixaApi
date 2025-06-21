@@ -21,7 +21,7 @@ namespace CodixaApi.Controllers
 
 
         [HttpPost("RegisterNewStudent")]
-        public async Task<IActionResult> RegisterStudent([FromBody] RegisterStudentDto model)
+        public async Task<IActionResult> RegisterStudent([FromForm] RegisterStudentDto model)
         {
             if (!ModelState.IsValid)
             {

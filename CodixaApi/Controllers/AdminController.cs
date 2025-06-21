@@ -20,10 +20,10 @@ namespace CodixaApi.Controllers
 
 
 
-        [HttpGet("GetInstructorsRequests/{PageNumber}")]
-        public async Task<IActionResult> GetAllInstructorsRequests([FromRoute] int PageNumber)
+        [HttpPost("GetInstructorsRequests/{PageNumber}")]
+        public async Task<IActionResult> GetAllInstructorsRequests([FromRoute] int PageNumber, [FromBody]string SearchTerm = null)
         {
-            var result = await _adminDashboardService.GetAllInstructors(10, PageNumber);
+            var result = await _adminDashboardService.GetAllInstructors(10, PageNumber, SearchTerm);
 
             return Ok(result);
         }

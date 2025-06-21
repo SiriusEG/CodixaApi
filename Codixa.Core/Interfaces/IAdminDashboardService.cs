@@ -7,7 +7,7 @@ namespace Codixa.Core.Interfaces
 {
     public interface IAdminDashboardService
     {
-        Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber);
+        Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber, string SearchTearm = null);
         Task<int> ChangeInstructorRequestStatus(ChangeInstructorRequestStatusDto requestStatusDto);
         Task<List<ReturnAllApprovedInstructorsDto>> GetAllApprovedInstructors();
 

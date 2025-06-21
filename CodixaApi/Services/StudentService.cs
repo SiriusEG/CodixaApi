@@ -78,22 +78,22 @@ namespace CodixaApi.Services
                 // تحديد مستخدم باستخدام Token
                 var UserId = await _AuthenticationService.GetUserIdFromToken(token);
 
-                // إذا كان UserId فارغًا، رمي استثناء
+              
                 if (UserId == null)
                 {
                     throw new Exception("Sign in To Get Your Courses");
                 }
 
-                // استدعاء الوظيفة المخزنة والحصول على الدورات
+         
                 var courses = await _UnitOfWork.ExecuteTableValuedFunctionAsync<GetStudentCoursesResponseDto>("GetStudentCourses", UserId);
 
-                // إذا كانت هناك دورات، قم بإرجاعها
+  
                 if (courses != null)
                 {
                     return courses;
                 }
 
-                // إذا لم توجد دورات، قم بإرجاع قائمة فارغة
+               
                 return new List<GetStudentCoursesResponseDto>();
             }
             catch (Exception)

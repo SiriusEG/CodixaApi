@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Codixa.Core.Dtos.AccountDtos.Request
 {
@@ -22,6 +23,7 @@ namespace Codixa.Core.Dtos.AccountDtos.Request
         public DateTime DateOfBirth { get; set; }
         public bool Gender { get; set; }
 
+        public IFormFile? Photo { get; set; }
 
     }
 }

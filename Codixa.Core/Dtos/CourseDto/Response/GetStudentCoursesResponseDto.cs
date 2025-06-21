@@ -16,6 +16,7 @@ namespace Codixa.Core.Dtos.CourseDto.Response
         public string CourseDescription { get; set; }
         public string CoursePhoto { get; set; }
         public string CategoryName { get; set; }
+        public decimal ProgressPercentage { get; set; }
 
     }
 }

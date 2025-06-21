@@ -107,7 +107,32 @@ namespace CodixaApi.Services
         }
 
  
-
+        public async Task<string> MarkLessonAsCompleted (int LessonId,string token)
+        {
+            try
+            {
+                var UserId = await _authenticationService.GetUserIdFromToken(token);
+             
+                if (UserId == null)
+                {
+                    throw new Exception("Missing Authorization");
+                }
+                var jsonData = "";
+                if (LessonId != 0)
+                {
+                    jsonData = await _UnitOfWork.ExecuteStoredProcedureAsStringAsync(
+                   "MarkLessonAsCompleted",
+                   "@LessonId", LessonId,
+                   "@UserId", UserId);
+                }
+       
+                return "Done";
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
     }
 }

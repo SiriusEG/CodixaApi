@@ -16,9 +16,9 @@ namespace CodixaApi.Controllers
             _instructorService = instructorService;
         }
 
-        [HttpGet("GetStudentsRequestsByCourse/{CourseId}/{PageNumber}")]
+        [HttpPost("GetStudentsRequestsByCourse/{CourseId}/{PageNumber}")]
         [Authorize(Roles = "Instructor")]
-        public async Task<IActionResult> StudentRequestToEnrollCourse([FromRoute] int CourseId, [FromRoute]int pageNumber)
+        public async Task<IActionResult> StudentRequestToEnrollCourse([FromRoute] int CourseId, [FromRoute]int pageNumber, [FromBody] string StudentName = null)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace CodixaApi.Controllers
                 }
 
                 // Pass the token and DTO to the service class
-                var result = await _instructorService.GetStudentRequestToEnrollCourse(token, CourseId, pageNumber,10);
+                var result = await _instructorService.GetStudentRequestToEnrollCourse(token, CourseId, pageNumber,10, StudentName);
                 return Ok(result);
             }
             catch (Exception ex)

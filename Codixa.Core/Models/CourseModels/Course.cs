@@ -48,6 +48,8 @@ namespace Codixa.Core.Models.CourseModels
 
         public virtual ICollection<CourseProgress> StudentProgresses { get; set; }
 
+        public virtual SectionProgress SectionProgress { get; set; }
+
 
     }
 }

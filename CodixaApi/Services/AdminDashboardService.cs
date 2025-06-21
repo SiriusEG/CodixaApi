@@ -19,7 +19,7 @@ namespace CodixaApi.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber)
+        public async Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber, string SearchTearm=null)
         {
             ReturnAllInstructorsReqDto ReturnAllInstructorsReqDto = null;
             try
@@ -27,7 +27,8 @@ namespace CodixaApi.Services
                 string jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
                 "ShowAllInstructorRequest",
                     "@PageSize", pagesize,
-                    "@PageNumber", pagenumber
+                    "@PageNumber", pagenumber,
+                    "@SearchTerm", SearchTearm
                 );
 
                 if (!string.IsNullOrEmpty(jsonData))

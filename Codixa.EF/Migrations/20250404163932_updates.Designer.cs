@@ -4,6 +4,7 @@ using Codxia.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Codixa.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250404163932_updates")]
+    partial class updates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,9 +55,6 @@ namespace Codixa.EF.Migrations
                     b.Property<string>("CoursePhoto")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ProgressPercentage")
-                        .HasColumnType("decimal(18,2)");
 
                     b.ToTable((string)null);
 
@@ -695,9 +695,6 @@ namespace Codixa.EF.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PhotoId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -717,8 +714,6 @@ namespace Codixa.EF.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("PhotoId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -924,19 +919,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "64624a32-a455-42dd-b9fa-878778b68545",
+                            Id = "c3abba11-d598-4d28-8218-2b084ff716e6",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "85971f2d-a08c-4aec-bd65-0ef451144f26",
+                            Id = "4d1d7734-cec8-46b2-8737-ce26fbb10602",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "dc8489ff-4b2a-4574-b994-15feed950fd6",
+                            Id = "bf6ee0bd-7924-4146-ad8f-c018e9aea088",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -1335,15 +1330,6 @@ namespace Codixa.EF.Migrations
                     b.Navigation("Section");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("Codixa.Core.Models.UserModels.AppUser", b =>
-                {
-                    b.HasOne("Codixa.Core.Models.sharedModels.FileEntity", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId");
-
-                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.Instructor", b =>

@@ -20,11 +20,13 @@ namespace Codixa.Core.Dtos.AccountDtos.Request
         public string Specialty { get; set; }
         [Required]
         public IFormFile Cv { get; set; }
-
+      
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
         public DateTime DateOfBirth { get; set; }
         public bool Gender { get; set; }
+
+        public IFormFile? Photo { get; set; }
     }
 }

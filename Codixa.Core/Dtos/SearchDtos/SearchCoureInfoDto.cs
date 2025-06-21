@@ -7,5 +7,6 @@
         public string CourseDescription { get; set; }
         public string CourseCardPhoto { get; set; }
         public string CategoryName { get; set; }
+        public string InstructorFullName { get; set; }
     }
 }
