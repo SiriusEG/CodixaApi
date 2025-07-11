@@ -539,28 +539,44 @@ namespace Codixa.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Certifications",
-                columns: table => new
-                {
-                    CertificationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    TestResultId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Certifications", x => x.CertificationId);
-                    table.ForeignKey(
-                        name: "FK_Certifications_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "StudentId");
-                    table.ForeignKey(
-                        name: "FK_Certifications_TestResults_TestResultId",
-                        column: x => x.TestResultId,
-                        principalTable: "TestResults",
-                        principalColumn: "TestResultId");
-                });
+         name: "Certifications",
+         columns: table => new
+         {
+             CertificationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+             StudentId = table.Column<int>(type: "int", nullable: false),
+             InstructorId = table.Column<int>(type: "int", nullable: false),
+             CourseId = table.Column<int>(type: "int", nullable: false),
+             TestResultId = table.Column<int>(type: "int", nullable: false)
+         },
+         constraints: table =>
+         {
+             table.PrimaryKey("PK_Certifications", x => x.CertificationId);
+             table.ForeignKey(
+                 name: "FK_Certifications_Students_StudentId",
+                 column: x => x.StudentId,
+                 principalTable: "Students",
+                 principalColumn: "StudentId",
+                 onDelete: ReferentialAction.Cascade);
+             table.ForeignKey(
+                 name: "FK_Certifications_Courses_CourseId",
+                 column: x => x.CourseId,
+                 principalTable: "Courses",
+                 principalColumn: "CourseId",
+                 onDelete: ReferentialAction.Cascade);
+             table.ForeignKey(
+                 name: "FK_Certifications_Instructors_InstructorId",
+                 column: x => x.InstructorId,
+                 principalTable: "Instructors",
+                 principalColumn: "InstructorId",
+                 onDelete: ReferentialAction.Cascade);
+             table.ForeignKey(
+                 name: "FK_Certifications_TestResults_TestResultId",
+                 column: x => x.TestResultId,
+                 principalTable: "TestResults",
+                 principalColumn: "TestResultId",
+                 onDelete: ReferentialAction.Cascade);
+         });
+
 
             migrationBuilder.CreateTable(
                 name: "UserAnswers",

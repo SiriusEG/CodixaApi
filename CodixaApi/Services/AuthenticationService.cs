@@ -1,6 +1,7 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.AccountDtos.Response;
+using Codixa.Core.Dtos.adminDashDtos.AdminGetUsersDtos;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.UserModels;
@@ -330,6 +331,179 @@ namespace CodixaApi.Services
             {
                 // Handle exceptions (e.g., invalid token format)
                 throw new Exception("Failed to extract user ID from token.", ex);
+            }
+        }
+
+
+
+
+        //change Instructor Data
+        public async Task<GetAllInstructorDto> ChangeInstructorData(string Token ,ChangeInstructorDataDto changeInstructorData)
+        {
+            try
+            {
+
+                var UserId = await GetUserIdFromToken(Token);   
+                var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(u => u.Id == UserId,x=>x.Include(x=>x.Instructor),x=>x.Include(x=>x.Photo));
+
+                if (User == null) 
+                {
+                    throw new Exception("User Not Found");
+                }
+                var PasswordCheak = await _unitOfWork.UsersManger.CheckPasswordAsync(User, changeInstructorData.Password);
+
+                if (!PasswordCheak)
+                {
+                    throw new Exception("Entered Password Is not Correct");
+                }
+                if (!string.IsNullOrWhiteSpace(changeInstructorData.UserName))
+                    User.UserName = changeInstructorData.UserName;
+
+                if (!string.IsNullOrWhiteSpace(changeInstructorData.Email))
+                    User.Email = changeInstructorData.Email;
+
+                if (!string.IsNullOrWhiteSpace(changeInstructorData.Specialty))
+                    User.Instructor.Specialty = changeInstructorData.Specialty;
+
+                if (!string.IsNullOrWhiteSpace(changeInstructorData.InstructorFullName))
+                    User.Instructor.InstructorFullName = changeInstructorData.InstructorFullName;
+
+                if (!string.IsNullOrWhiteSpace(changeInstructorData.PhoneNumber))
+                    User.PhoneNumber = changeInstructorData.PhoneNumber;
+                FileEntity file = new FileEntity();
+                if (changeInstructorData.ProfilePic != null)
+                {
+                     file = await _unitOfWork.Files.UploadFileAsync(changeInstructorData.ProfilePic, Path.Combine("uploads", "UsersPics"));
+                    if (file != null) { 
+                        User.Photo = file;
+                    }
+                }
+
+                User = await _unitOfWork.UsersManger.UpdateAsync(User);
+                await _unitOfWork.Complete();
+
+                return new GetAllInstructorDto()
+                {
+                    Id = User.Id,
+                    UserName = User.UserName,
+                    Email = User.Email,
+                    PhoneNumber = User.PhoneNumber,
+                    InstructorFullName = User.Instructor.InstructorFullName,
+                    Specialty = User.Instructor.Specialty,
+                    ProfilePic = file?.FilePath
+                };
+            }
+            catch (Exception)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw;
+            }
+        }
+        public async Task<GetAllStudentsDto> ChangeStudentData(string Token, ChangeStudentDataDto changeStudentDataDto)
+        {
+            try
+            {
+
+                var UserId = await GetUserIdFromToken(Token);
+                var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(u => u.Id == UserId, x => x.Include(x => x.Student), x => x.Include(x => x.Photo));
+                if (User == null)
+                {
+                    throw new Exception("User Not Found");
+                }
+                var PasswordCheak = await _unitOfWork.UsersManger.CheckPasswordAsync(User, changeStudentDataDto.Password);
+
+                if (!PasswordCheak)
+                {
+                    throw new Exception("Entered Password Is not Correct");
+                }
+
+                if (!string.IsNullOrWhiteSpace(changeStudentDataDto.UserName))
+                    User.UserName = changeStudentDataDto.UserName;
+
+                if (!string.IsNullOrWhiteSpace(changeStudentDataDto.Email))
+                    User.Email = changeStudentDataDto.Email;
+
+
+                if (!string.IsNullOrWhiteSpace(changeStudentDataDto.StudentFullName))
+                    User.Student.StudentFullName = changeStudentDataDto.StudentFullName;
+
+                if (!string.IsNullOrWhiteSpace(changeStudentDataDto.PhoneNumber))
+                    User.PhoneNumber = changeStudentDataDto.PhoneNumber;
+                FileEntity file = new FileEntity();
+                if (changeStudentDataDto.ProfilePic != null)
+                {
+                    file = await _unitOfWork.Files.UploadFileAsync(changeStudentDataDto.ProfilePic, Path.Combine("uploads", "UsersPics"));
+                    if (file != null)
+                    {
+                        User.Photo = file;
+                    }
+                }
+
+                User = await _unitOfWork.UsersManger.UpdateAsync(User);
+                await _unitOfWork.Complete();
+
+                return new GetAllStudentsDto { Id = User.Id, Email = User.Email, UserName = User.UserName, StudentFullName = User.Student.StudentFullName, PhoneNumber = User.PhoneNumber, ProfilePic = file?.FilePath };
+            }
+            catch (Exception)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw;
+            }
+        }
+
+
+        //change password
+
+        public async Task<bool> ChangeUserPassword(string Token, ChangeUserWithConfirmDto changeUserWithConfirmDto)
+        {
+            try
+            {
+
+                var UserId = await GetUserIdFromToken(Token);
+                var result = await _unitOfWork.UsersManger.ChangePasswordWithOldAsync(UserId, changeUserWithConfirmDto.OldPassword, changeUserWithConfirmDto.NewPassword);
+      
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw new Exception("Failed Change Password.", ex);
+            }
+        }
+
+
+
+        public async Task<GetAllStudentsDto> GetStudentData(string Token)
+        {
+            try
+            {
+                var UserId = await GetUserIdFromToken(Token);
+
+                var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(u => u.Id == UserId, x => x.Include(x => x.Student), x => x.Include(x => x.Photo));
+
+                return new GetAllStudentsDto { Id = User.Id, UserName = User.UserName, Email = User.Email, PhoneNumber = User.PhoneNumber, ProfilePic = User.Photo?.FilePath, StudentFullName = User.Student.StudentFullName };
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw new Exception("Student Not Found", ex);
+            }
+        }
+
+        public async Task<GetAllInstructorDto> GetInstructorData(string Token)
+        {
+            try
+            {
+                var UserId = await GetUserIdFromToken(Token);
+
+                var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(u => u.Id == UserId, x => x.Include(x => x.Instructor), x => x.Include(x => x.Photo));
+
+                return new GetAllInstructorDto { Id = User.Id, UserName = User.UserName, Email = User.Email, PhoneNumber = User.PhoneNumber, ProfilePic = User.Photo?.FilePath, InstructorFullName = User.Instructor.InstructorFullName, Specialty = User.Instructor.Specialty};
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., invalid token format)
+                throw new Exception("Instructor Not Found.", ex);
             }
         }
     }

@@ -50,6 +50,7 @@ namespace Codixa.Core.Models.CourseModels
 
         public virtual SectionProgress SectionProgress { get; set; }
 
+        public virtual ICollection<Certification> Certifications { get; set; } = new List<Certification>();
 
     }
 }

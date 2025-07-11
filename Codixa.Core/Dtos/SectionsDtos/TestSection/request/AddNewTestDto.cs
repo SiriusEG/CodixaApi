@@ -4,7 +4,7 @@
     {
         public int SectionId { get; set; }
         public decimal SuccessResult { get; set; }
-
+        public int MaxAttempts { get; set; }
         public List<AddNewQuestionDto> Questions { get; set; }
     }
 }

@@ -329,82 +329,123 @@ namespace CodixaApi.Services
 
 
         //exam Section models
+        public async Task<AddNewTestDto> GetTestBySectionId(int sectionId)
+        {
+            // Get section test with its questions and choices
+            var sectionTest = await _unitOfWork.SectionTests.FirstOrDefaultAsync(
+                st => st.SectionId == sectionId,
+                st => st.Include(x => x.Questions).ThenInclude(q => q.ChoicesQuestions)
+            );
 
-        public async Task<string> AddTest(AddNewTestDto addNewTestDto)
+            if (sectionTest == null)
+                throw new Exception($"No test found for section ID: {sectionId}");
+
+            var testDto = new AddNewTestDto
+            {
+                SectionId = sectionTest.SectionId,
+                SuccessResult = sectionTest.SuccessResult,
+                MaxAttempts = sectionTest.MaxAttempts,
+                Questions = sectionTest.Questions.Select(q => new AddNewQuestionDto
+                {
+                    Text = q.Text,
+                    ChoiceAnswer = q.ChoicesQuestions.Select(c => new AddNewChoiceAnswerDto
+                    {
+                        ChoicesQuestionText = c.ChoicesQuestionText,
+                        IsTrue = c.IsTrue
+                    }).ToList()
+                }).ToList()
+            };
+
+            return testDto;
+        }
+
+        public async Task<string> AddOrUpdateTest(AddNewTestDto addNewTestDto)
         {
             try
             {
-                
                 var section = await _unitOfWork.Sections.GetByIdAsync(addNewTestDto.SectionId);
-
-               
                 if (section == null)
-                {
                     throw new Exception($"Section with ID {addNewTestDto.SectionId} not found.");
-                }
-                var sectionTestCheak = await _unitOfWork.SectionTests.FirstOrDefaultAsync(x=>x.SectionId == section.SectionId);
 
+                var sectionTest = await _unitOfWork.SectionTests.FirstOrDefaultAsync(
+                    x => x.SectionId == section.SectionId,
+                    x => x.Include(st => st.Questions).ThenInclude(q => q.ChoicesQuestions)
+                );
 
-                if (sectionTestCheak != null)
+                if (sectionTest == null)
                 {
-                    throw new Exception("You Have Added Section Test!");
-                }
-
-                SectionTest sectionTest = new SectionTest
-                {
-                    SuccessResult = addNewTestDto.SuccessResult,
-                    SectionId = section.SectionId,
-                    Questions = new List<Question>() 
-                };
-
-               
-                if (addNewTestDto.Questions != null)
-                {
-                    foreach (var question in addNewTestDto.Questions)
+                    // ➕ Create new SectionTest
+                    sectionTest = new SectionTest
                     {
-                        // Ensure ChoiceAnswer is not null
-                        if (question.ChoiceAnswer == null)
-                        {
-                            throw new Exception("ChoiceAnswer cannot be null for a question.");
-                        }
+                        SectionId = section.SectionId,
+                        SuccessResult = addNewTestDto.SuccessResult,
+                        MaxAttempts = addNewTestDto.MaxAttempts,
+                        Questions = new List<Question>()
+                    };
 
-                       
-                        List<ChoicesQuestion> choicesQuestions = new List<ChoicesQuestion>();
-
-                        foreach (var answer in question.ChoiceAnswer)
-                        {
-                            ChoicesQuestion choicesQuestion = new ChoicesQuestion
-                            {
-                                ChoicesQuestionText = answer.ChoicesQuestionText,
-                                IsTrue = answer.IsTrue
-                            };
-                            choicesQuestions.Add(choicesQuestion);
-                        }
-
-                       
-                        Question newQuestion = new Question
-                        {
-                            Text = question.Text,
-                            ChoicesQuestions = choicesQuestions
-                        };
-
-                        
-                        sectionTest.Questions.Add(newQuestion);
-                    }
+                    _unitOfWork.SectionTests.AddAsync(sectionTest);
+                }
+                else
+                {
+                    // 🛠 Update existing SectionTest properties
+                    sectionTest.SuccessResult = addNewTestDto.SuccessResult;
+                    sectionTest.MaxAttempts = addNewTestDto.MaxAttempts;
                 }
 
-               
-                await _unitOfWork.SectionTests.AddAsync(sectionTest);
+                var updatedQuestions = new List<Question>();
+
+                foreach (var dtoQuestion in addNewTestDto.Questions)
+                {
+                    // Find existing question (by text) or create new
+                    var existingQuestion = sectionTest.Questions
+                        .FirstOrDefault(q => q.Text == dtoQuestion.Text);
+
+                    if (existingQuestion == null)
+                    {
+                        // ➕ New question
+                        existingQuestion = new Question
+                        {
+                            Text = dtoQuestion.Text,
+                            ChoicesQuestions = new List<ChoicesQuestion>()
+                        };
+                        sectionTest.Questions.Add(existingQuestion);
+                    }
+
+                    // Clear and re-add choices (simple strategy)
+                    existingQuestion.ChoicesQuestions.Clear();
+
+                    foreach (var dtoChoice in dtoQuestion.ChoiceAnswer)
+                    {
+                        existingQuestion.ChoicesQuestions.Add(new ChoicesQuestion
+                        {
+                            ChoicesQuestionText = dtoChoice.ChoicesQuestionText,
+                            IsTrue = dtoChoice.IsTrue
+                        });
+                    }
+
+                    updatedQuestions.Add(existingQuestion);
+                }
+
+                // 🗑 Remove questions that were deleted
+                var questionsToRemove = sectionTest.Questions
+                    .Where(q => !updatedQuestions.Any(u => u.Text == q.Text))
+                    .ToList();
+
+                foreach (var toRemove in questionsToRemove)
+                {
+                    sectionTest.Questions.Remove(toRemove);
+                }
+
                 await _unitOfWork.Complete();
 
-                return "Section Test Added";
+                return sectionTest.SectionTestId > 0 ? "Section Test Updated" : "Section Test Added";
             }
             catch (Exception ex)
             {
-          
-                throw;
+                throw new Exception("Error processing test: " + ex.Message);
             }
         }
+
 
 
 

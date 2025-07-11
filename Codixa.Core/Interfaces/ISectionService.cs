@@ -11,6 +11,7 @@ namespace Codixa.Core.Interfaces
        Task<string> DeleteSection(DeleteSectionRequestDto deleteSectionRequestDto);
        Task<UpdateSectionNameResDto> UpdateSectionName(UpdateSectionNameReqDto updateSectionNameReqDto);
        Task<int> UpdateSectionsAndLessonsAsync(List<UpdateSectionLessonNameOrderdto> sectionsToUpdate);
-       Task<string> AddTest(AddNewTestDto addNewTestDto);
+        Task<string> AddOrUpdateTest(AddNewTestDto addNewTestDto);
+        Task<AddNewTestDto> GetTestBySectionId(int sectionId);
     }
 }

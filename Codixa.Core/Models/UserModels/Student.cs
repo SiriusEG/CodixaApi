@@ -28,5 +28,6 @@ namespace Codixa.Core.Models.UserModels
         public virtual ICollection<CourseRequest> CourseRequests { get; set; }
         public virtual ICollection<CourseProgress> StudentProgresses { get; set; }
 
+
     }
 }

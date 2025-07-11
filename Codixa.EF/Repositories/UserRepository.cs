@@ -55,7 +55,15 @@ namespace Codxia.EF.Repositories
         {
             return await _userManager.Users.ToListAsync();
         }
+        public async Task<IEnumerable<AppUser>> GetAllStudentsAsync()
+        {
+            return await _userManager.Users.Where(u => u.Student != null).Include(x => x.Student).Include(x => x.Photo).ToListAsync();
+        }
 
+        public async Task<IEnumerable<AppUser>> GetAllInstructorsAsync()
+        {
+            return await _userManager.Users.Where(u => u.Instructor != null && u.InstructorJoinRequests !=null && u.InstructorJoinRequests.Status== "Accepted").Include(x => x.Instructor).Include(x=>x.Photo).Include(x=>x.InstructorJoinRequests).ToListAsync();
+        }
 
         public async Task<IdentityResult> ChangePasswordAsync(AppUser User, string newPassword)
         {
@@ -73,6 +81,28 @@ namespace Codxia.EF.Repositories
             return await _userManager.SetUserNameAsync(user, newUserName);
         }
 
- 
+
+        public async Task<bool> ChangePasswordWithOldAsync(string userId, string oldPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            return result.Succeeded;
+        }
+
+        public async Task<bool> ChangePasswordWithoutOldAsync(string userId, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+
+            return result.Succeeded;
+        }
+
     }
 }

@@ -15,9 +15,12 @@ namespace Codxia.Core.Interfaces
 
         Task<IdentityResult> ChangePasswordAsync(AppUser User, string newPassword);
         Task<IdentityResult> ChangeUserNameAsync(AppUser user, string newUserName);
-
+        Task<IEnumerable<AppUser>> GetAllInstructorsAsync();
+        Task<IEnumerable<AppUser>> GetAllStudentsAsync();
         Task<IEnumerable<AppUser>> GetAllUsersAsync();
+        Task<bool> ChangePasswordWithoutOldAsync(string userId, string newPassword);
+        Task<bool> ChangePasswordWithOldAsync(string userId, string oldPassword, string newPassword);
 
-       
+
     }
 }

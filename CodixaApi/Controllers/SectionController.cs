@@ -2,6 +2,7 @@
 using Codixa.Core.Dtos.SectionsDtos.Request;
 using Codixa.Core.Dtos.SectionsDtos.TestSection.request;
 using Codixa.Core.Interfaces;
+using CodixaApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -134,6 +135,22 @@ namespace CodixaApi.Controllers
             }
         }
 
+
+        [HttpGet("GetTestSectionQuestions/{sectionId}")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> GetTestBySectionId(int sectionId)
+        {
+            try
+            {
+                var result = await _sectionService.GetTestBySectionId(sectionId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("AddTestSectionQuestions")]
         [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> AddTestSectionQuestions([FromBody] AddNewTestDto addNewTestDto)
@@ -141,12 +158,12 @@ namespace CodixaApi.Controllers
             try
             {
 
-                var updatedSections = await _sectionService.AddTest(addNewTestDto);
+                var updatedSections = await _sectionService.AddOrUpdateTest(addNewTestDto);
                 if (updatedSections == "")
                 {
                     return BadRequest(new { message = "There are an error while adding test section" });
                 }
-                return Ok(new { message = "test section added successfully." });
+                return Ok(new { message = updatedSections });
             }
             catch (Exception ex)
             {

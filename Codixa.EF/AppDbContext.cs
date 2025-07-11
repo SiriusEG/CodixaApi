@@ -37,6 +37,7 @@ namespace Codxia.EF
         public DbSet<CourseRequest> CourseRequests { get; set; }
         public DbSet<FileEntity> Files { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<StudentTestAttempt> StudentTestAttempts { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

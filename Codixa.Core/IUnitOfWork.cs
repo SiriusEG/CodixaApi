@@ -1,6 +1,7 @@
 ﻿using Codixa.Core.Interfaces;
 using Codixa.Core.Models.CourseModels;
 using Codixa.Core.Models.SectionsTestsModels;
+using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.StudentCourseModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core.Interfaces;
@@ -30,6 +31,8 @@ namespace Codxia.Core
         IBaseRepository<SectionProgress> SectionProgress { get; }
         IBaseRepository<LessonProgress> LessonProgress { get; }
         IBaseRepository<CourseProgress> CourseProgress { get; }
+        IBaseRepository<StudentTestAttempt> StudentTestAttempts { get; }
+        IBaseRepository<Certification> Certifications { get; }
 
         IUserRepository UsersManger { get; }
         IFileRepository Files { get; }

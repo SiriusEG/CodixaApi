@@ -12,9 +12,12 @@ namespace Codixa.Core.Models.UserModels
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
         public virtual Student Student { get; set; }
         public virtual Instructor Instructor { get; set; }
+        public virtual InstructorJoinRequest InstructorJoinRequests { get; set; }
 
         public string? PhotoId { get; set; }
         [ForeignKey(nameof(PhotoId))]
         public FileEntity?  Photo { get; set; }
+
+
     }
 }

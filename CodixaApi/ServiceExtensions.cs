@@ -43,6 +43,7 @@ namespace CodxiaApi
             services.AddTransient<ICourseFeedbackService, CourseFeedbackService>();
             services.AddTransient<ICourseProgresService, CourseProgressService>();
             services.AddTransient<ITestService, TestService>();
+            services.AddTransient<ICertificationService, CertificationService>();
 
          
        

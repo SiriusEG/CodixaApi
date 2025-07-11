@@ -28,6 +28,8 @@ namespace Codixa.Core.Models.UserModels
         public virtual FileEntity cv { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
         public virtual ICollection<CourseRequest> ReviewedRequests { get; set; }
+        public virtual ICollection<Certification> Certifications { get; set; } = new List<Certification>();
+
 
     }
 }

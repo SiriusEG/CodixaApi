@@ -4,6 +4,7 @@ using Codxia.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Codixa.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250704082642_adding-attemp-id-to-test-result")]
+    partial class addingattempidtotestresult
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -897,17 +900,11 @@ namespace Codixa.EF.Migrations
 
             modelBuilder.Entity("Codixa.Core.Models.sharedModels.Certification", b =>
                 {
-                    b.Property<string>("CertificationId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CertificationIssueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CourseId")
+                    b.Property<int>("CertificationId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("InstructorId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertificationId"));
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -916,10 +913,6 @@ namespace Codixa.EF.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CertificationId");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("InstructorId");
 
                     b.HasIndex("StudentId");
 
@@ -976,19 +969,19 @@ namespace Codixa.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "887d05be-34b9-4792-ac7b-3b65a848be6a",
+                            Id = "227e1dec-d4e0-4bf0-bfa8-4902b49079de",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "2f167594-0216-40a4-a74e-c24284dc7965",
+                            Id = "3553f9a8-8492-493f-8688-1bfefa8bd6a3",
                             Name = "Instructor",
                             NormalizedName = "INSTRUCTOR"
                         },
                         new
                         {
-                            Id = "b90aa0a4-8b24-4ac7-924f-dbaeebcb2fd4",
+                            Id = "b59e00d7-2644-4622-bddd-943679872f54",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -1495,18 +1488,6 @@ namespace Codixa.EF.Migrations
 
             modelBuilder.Entity("Codixa.Core.Models.sharedModels.Certification", b =>
                 {
-                    b.HasOne("Codixa.Core.Models.CourseModels.Course", "Course")
-                        .WithMany("Certifications")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Codixa.Core.Models.UserModels.Instructor", "Instructor")
-                        .WithMany("Certifications")
-                        .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Codixa.Core.Models.UserModels.Student", "Student")
                         .WithMany("Certifications")
                         .HasForeignKey("StudentId")
@@ -1518,10 +1499,6 @@ namespace Codixa.EF.Migrations
                         .HasForeignKey("Codixa.Core.Models.sharedModels.Certification", "TestResultId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Instructor");
 
                     b.Navigation("Student");
 
@@ -1586,8 +1563,6 @@ namespace Codixa.EF.Migrations
 
             modelBuilder.Entity("Codixa.Core.Models.CourseModels.Course", b =>
                 {
-                    b.Navigation("Certifications");
-
                     b.Navigation("CourseRequests");
 
                     b.Navigation("Enrollments");
@@ -1659,8 +1634,6 @@ namespace Codixa.EF.Migrations
 
             modelBuilder.Entity("Codixa.Core.Models.UserModels.Instructor", b =>
                 {
-                    b.Navigation("Certifications");
-
                     b.Navigation("Courses");
 
                     b.Navigation("ReviewedRequests");

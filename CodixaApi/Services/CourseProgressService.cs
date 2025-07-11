@@ -71,7 +71,7 @@ namespace CodixaApi.Services
 
         //move to next lesson
 
-        public async Task<string> GetLessonDetails(GetLessonDetailsDto getLessonDetailsDto,string token )
+        public async Task<string> GetLessonDetails(GetLessonDetailsDto getLessonDetailsDto,string token)
         {
             try
             {
