@@ -8,7 +8,7 @@ namespace Codxia.Core.Interfaces
 
         Task DeleteAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync();
-
+        IQueryable<T> GetQueryable();
         Task<T> GetByIdAsync(int id);
 
         Task AddRangeAsync(IEnumerable<T> entities);

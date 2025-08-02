@@ -22,6 +22,7 @@ namespace Codxia.EF
     {
         private readonly AppDbContext _Context;
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         public IUserRepository UsersManger { get; private set; }
         private readonly IWebHostEnvironment _environment;
         public IBaseRepository<Category> Categories { get; private set; }
@@ -47,19 +48,19 @@ namespace Codxia.EF
         public IBaseRepository<StudentTestAttempt> StudentTestAttempts { get; private set; }
         public IBaseRepository<Certification> Certifications { get; private set; }
 
-        public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
+        public UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment,RoleManager<IdentityRole> roleManager)
         {
             _Context = context;
             _environment = environment;
             _userManager = userManager;
-            UsersManger = new UserRepository(_userManager, _Context);
+            _roleManager = roleManager;
+            UsersManger = new UserRepository(_userManager, _Context, _roleManager);
             Students = new BaseRepository<Student>(_Context);
             Instructors = new BaseRepository<Instructor>(_Context);
             Categories = new BaseRepository<Category>(_Context);
             RefreshTokens = new BaseRepository<RefreshToken>(_Context);
             InstructorJoinRequests = new BaseRepository<InstructorJoinRequest>(_Context);
             Files = new FileRepository(_Context, _environment);
-
             Courses = new BaseRepository<Course>(_Context);
             Sections = new BaseRepository<Section>(_Context);
             Lessons = new BaseRepository<Lesson>(_Context);
@@ -76,7 +77,6 @@ namespace Codxia.EF
             CourseProgress = new BaseRepository<CourseProgress>(_Context);
             StudentTestAttempts = new BaseRepository<StudentTestAttempt>(_Context);
             Certifications = new BaseRepository<Certification>(_Context);
-
         }
 
         public async Task<List<T>> ExecuteStoredProcedureAsync<T>(string storedProcedure, params object[] parameters) where T : class

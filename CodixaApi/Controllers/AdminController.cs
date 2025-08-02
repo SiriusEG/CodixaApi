@@ -1,5 +1,6 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.adminDashDtos;
 using Codixa.Core.Dtos.adminDashDtos.AdminGetUsersDtos;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Interfaces;
@@ -238,6 +239,67 @@ namespace CodixaApi.Controllers
                 return StatusCode(500, new
                 {
                     Message = "An unexpected error occurred while fetching instructors.",
+                    Error = ex.Message
+                });
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllAdmins")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            try
+            {
+
+                var Result = await _adminDashboardService.GetallAdmins();
+                return Ok(new
+                {
+                    data = Result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "An unexpected error occurred while fetching Admins.",
+                    Error = ex.Message
+                });
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("ChangeAdminData")]
+        public async Task<IActionResult> ChangeAdminData([FromForm] UpdateAdminDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+
+            try
+            {
+                var updatedAdmin = await _adminDashboardService.UpdateAdminData(dto);
+
+                if (updatedAdmin == null)
+                {
+                    return NotFound(new { Message = "Admin not found." });
+                }
+
+                return Ok(new
+                {
+                    Message = "Admin updated successfully.",
+                    Data = updatedAdmin
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "An unexpected error occurred while updating Admin.",
                     Error = ex.Message
                 });
             }

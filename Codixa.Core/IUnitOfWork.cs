@@ -5,6 +5,7 @@ using Codixa.Core.Models.sharedModels;
 using Codixa.Core.Models.StudentCourseModels;
 using Codixa.Core.Models.UserModels;
 using Codxia.Core.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -35,6 +36,7 @@ namespace Codxia.Core
         IBaseRepository<Certification> Certifications { get; }
 
         IUserRepository UsersManger { get; }
+
         IFileRepository Files { get; }
         Task<List<T>> ExecuteStoredProcedureAsync<T>(string storedProcedure, params object[] parameters) where T : class;
         Task<int> ExecuteStoredProcedureAsyncIntReturn(string storedProcedure, params object[] parameters);

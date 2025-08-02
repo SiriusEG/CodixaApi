@@ -12,7 +12,10 @@ namespace Codxia.EF.Repositories
         {
             _Context = context;
         }
-
+        public IQueryable<T> GetQueryable()
+        {
+            return _Context.Set<T>().AsQueryable();
+        }
         public async Task<T> AddAsync(T entity)
         {
             await _Context.Set<T>().AddAsync(entity);

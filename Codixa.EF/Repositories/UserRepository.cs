@@ -2,18 +2,21 @@
 using Codxia.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Codxia.EF.Repositories
 {
     public class UserRepository : BaseRepository<AppUser>, IUserRepository
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly AppDbContext _context;
 
-        public UserRepository(UserManager<AppUser> userManager, AppDbContext context) : base(context)
+        public UserRepository(UserManager<AppUser> userManager, AppDbContext context, RoleManager<IdentityRole> roleManager) : base(context)
         {
             _userManager = userManager;
             _context = context;
+            _roleManager = roleManager;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUser user, string password)
@@ -54,6 +57,20 @@ namespace Codxia.EF.Repositories
         public async Task<IEnumerable<AppUser>> GetAllUsersAsync()
         {
             return await _userManager.Users.ToListAsync();
+        }
+
+        public async Task<IEnumerable<AppUser>> GetUsersInRoleAdmin()
+        {
+            var role = await _roleManager.FindByNameAsync("Admin");
+            if (role == null)
+                return new List<AppUser>();
+            var admins = await _context.Users
+            .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == role.Id))
+            .Include(u => u.Photo)
+            .ToListAsync();
+
+            return admins;
+
         }
         public async Task<IEnumerable<AppUser>> GetAllStudentsAsync()
         {

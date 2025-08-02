@@ -323,17 +323,39 @@ namespace CodixaApi.Services
             return searchCoursesResopnseDto;
         }
             
-        public async Task<CourseDetailsResponseDto> GetCourseDetailsWithFeedbacksAsync(int courseId)
+        public async Task<CourseDetailsResponseDto> GetCourseDetailsWithFeedbacksAsync(int courseId,string? token)
         {
             CourseDetailsResponseDto courseDetailsResponse = null;
 
             try
             {
-                // Execute the stored procedure and retrieve JSON data
-                var jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                var UserId = "";
+                if (token != null)
+                {
+                     UserId = await _authenticationService.GetUserIdFromToken(token);
+                }
+               
+
+                var Student = await _unitOfWork.Students.FirstOrDefaultAsync(x => x.UserId == UserId);
+
+                var jsonData = "";
+                if (Student == null)
+                {
+                     jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
                     "GetCourseDetailsWithFeedbacks",
                     "@CourseId", courseId
-                );
+                    );
+                }
+                else
+                {
+               
+                     jsonData = await _unitOfWork.ExecuteStoredProcedureAsStringAsync(
+                    "GetCourseDetailsWithFeedbacks",
+                    "@CourseId", courseId,
+                    "@StudentId", Student.StudentId
+                    );
+                }
+         
 
                 // Check if JSON data is valid
                 if (!string.IsNullOrEmpty(jsonData))
@@ -360,6 +382,46 @@ namespace CodixaApi.Services
             }
 
             return courseDetailsResponse;
+        }
+
+
+
+        public async Task<List<CourseGetResponseDto>> GetLast3Courses()
+        {
+
+            try
+            {
+                var courses = await _unitOfWork.Courses
+                         .GetQueryable()
+                         .Where(x=>x.IsDeleted == false)
+                         .Include(c => c.Photo)
+                         .OrderByDescending(c => c.CourseId) // أو OrderByDescending(c => c.CreatedDate) لو عندك تاريخ
+                         .Take(3)
+                         .ToListAsync();
+
+
+                var result = courses.Select(course => new CourseGetResponseDto
+                {
+                    CourseId = course.CourseId,
+                    CourseName = course.CourseName,
+                    CourseDescription = course.CourseDescription,
+                    CourseCardPhotoFilePath = course.Photo?.FilePath,
+                    CategoryId = course.CategoryId,
+                    IsPublished = course.IsPublished,
+                    Level = course.Level,
+                    Language = course.Language
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("there are no Course With This Id ");
+
+            }
+            // return new addCourseResponseDto();
+
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using Codixa.Core.Dtos.CourseDto.Request;
+﻿using Codixa.Core.Dtos.CourseDto.CourseDetailsDtos;
+using Codixa.Core.Dtos.CourseDto.Request;
 using Codixa.Core.Dtos.SearchDtos;
 using Codixa.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -171,9 +172,23 @@ namespace CodixaApi.Controllers
                 {
                     return BadRequest("Course data Is Empty");
                 }
-                var result = await _courseService.GetCourseDetailsWithFeedbacksAsync(CourseId);
 
-                return Ok(result);
+                string token = null;
+                if (HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                {
+                    token = authHeader.ToString().Replace("Bearer ", "").Trim();
+                }
+                CourseDetailsResponseDto courseDetailsResponseDto = new CourseDetailsResponseDto();
+                if (string.IsNullOrEmpty(token)) {
+                    courseDetailsResponseDto = await _courseService.GetCourseDetailsWithFeedbacksAsync(CourseId,null);
+                }
+                else
+                {
+                    courseDetailsResponseDto = await _courseService.GetCourseDetailsWithFeedbacksAsync(CourseId,token);
+                }
+              
+
+                return Ok(courseDetailsResponseDto);
             }
             catch (Exception ex)
             {
@@ -205,5 +220,22 @@ namespace CodixaApi.Controllers
         }
 
 
+        [HttpGet("GetLastCourses")]
+        public async Task<IActionResult> GetLastCourses()
+        {
+
+            try
+            {
+             
+              var Course = await _courseService.GetLast3Courses();
+              return Ok(Course);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+
+        }
     }
 }

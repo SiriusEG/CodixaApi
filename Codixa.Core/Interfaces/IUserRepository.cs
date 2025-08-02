@@ -20,7 +20,7 @@ namespace Codxia.Core.Interfaces
         Task<IEnumerable<AppUser>> GetAllUsersAsync();
         Task<bool> ChangePasswordWithoutOldAsync(string userId, string newPassword);
         Task<bool> ChangePasswordWithOldAsync(string userId, string oldPassword, string newPassword);
-
+        Task<IEnumerable<AppUser>> GetUsersInRoleAdmin();
 
     }
 }

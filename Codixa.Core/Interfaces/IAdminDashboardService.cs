@@ -1,4 +1,5 @@
 ﻿using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.adminDashDtos;
 using Codixa.Core.Dtos.adminDashDtos.AdminGetUsersDtos;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.response;
@@ -19,5 +20,7 @@ namespace Codixa.Core.Interfaces
         Task<GetAllStudentsDto> changeStudentData(GetUpdateStudentsDto getAllStudentsDto);
         Task<GetAllInstructorDto> changeInstructorData(GetUpdateInstructorDto getAllInstructorDto);
         Task<string> changePassword(PasswordChangeDto passwordChangeDto);
+        Task<List<AdminGetDto>> GetallAdmins();
+        Task<AdminGetDto> UpdateAdminData(UpdateAdminDto updateAdminDto);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
 using Codixa.Core.Dtos.AccountDtos.Response;
+using Codixa.Core.Dtos.adminDashDtos;
 using Codixa.Core.Dtos.adminDashDtos.AdminGetUsersDtos;
 using Codixa.Core.Interfaces;
 using Codixa.Core.Models.sharedModels;
@@ -357,7 +358,10 @@ namespace CodixaApi.Services
                     throw new Exception("Entered Password Is not Correct");
                 }
                 if (!string.IsNullOrWhiteSpace(changeInstructorData.UserName))
-                    User.UserName = changeInstructorData.UserName;
+                {
+                    await _unitOfWork.UsersManger.ChangeUserNameAsync(User, changeInstructorData.UserName);
+                }
+
 
                 if (!string.IsNullOrWhiteSpace(changeInstructorData.Email))
                     User.Email = changeInstructorData.Email;
@@ -373,7 +377,11 @@ namespace CodixaApi.Services
                 FileEntity file = new FileEntity();
                 if (changeInstructorData.ProfilePic != null)
                 {
-                     file = await _unitOfWork.Files.UploadFileAsync(changeInstructorData.ProfilePic, Path.Combine("uploads", "UsersPics"));
+                    if (User.Photo != null)
+                    {
+                        await _unitOfWork.Files.DeleteAsync(User.Photo);
+                    }
+                    file = await _unitOfWork.Files.UploadFileAsync(changeInstructorData.ProfilePic, Path.Combine("uploads", "UsersPics"));
                     if (file != null) { 
                         User.Photo = file;
                     }
@@ -418,7 +426,9 @@ namespace CodixaApi.Services
                 }
 
                 if (!string.IsNullOrWhiteSpace(changeStudentDataDto.UserName))
-                    User.UserName = changeStudentDataDto.UserName;
+                {
+                    await _unitOfWork.UsersManger.ChangeUserNameAsync(User, changeStudentDataDto.UserName);
+                }
 
                 if (!string.IsNullOrWhiteSpace(changeStudentDataDto.Email))
                     User.Email = changeStudentDataDto.Email;
@@ -432,6 +442,10 @@ namespace CodixaApi.Services
                 FileEntity file = new FileEntity();
                 if (changeStudentDataDto.ProfilePic != null)
                 {
+                    if (User.Photo != null)
+                    {
+                        await _unitOfWork.Files.DeleteAsync(User.Photo);
+                    }
                     file = await _unitOfWork.Files.UploadFileAsync(changeStudentDataDto.ProfilePic, Path.Combine("uploads", "UsersPics"));
                     if (file != null)
                     {

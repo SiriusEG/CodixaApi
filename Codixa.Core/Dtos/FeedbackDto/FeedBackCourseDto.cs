@@ -7,5 +7,6 @@ namespace Codixa.Core.Dtos.FeedbackDto
         public string StudentFullName { get; set; }
         public string? Comment { get; set; }
         public RateEnum Rate { get; set; }
+        public bool UserCanDeleteOrUpdate { get; set; }
     }
 }

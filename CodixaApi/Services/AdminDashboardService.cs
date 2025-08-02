@@ -1,5 +1,6 @@
 ﻿using Codixa.Core.Custom_Exceptions;
 using Codixa.Core.Dtos.AccountDtos.Request;
+using Codixa.Core.Dtos.adminDashDtos;
 using Codixa.Core.Dtos.adminDashDtos.AdminGetUsersDtos;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.request;
 using Codixa.Core.Dtos.adminDashDtos.InstructorOperations.response;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace CodixaApi.Services
@@ -23,7 +25,7 @@ namespace CodixaApi.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber, string SearchTearm=null)
+        public async Task<ReturnAllInstructorsReqDto> GetAllInstructors(int pagesize, int pagenumber, string SearchTearm = null)
         {
             ReturnAllInstructorsReqDto ReturnAllInstructorsReqDto = null;
             try
@@ -62,7 +64,7 @@ namespace CodixaApi.Services
 
         public async Task<int> ChangeInstructorRequestStatus(ChangeInstructorRequestStatusDto requestStatusDto)
         {
- 
+
             // Execute the stored procedure
             int rowsAffected = await _unitOfWork.ExecuteStoredProcedureAsyncIntReturn(
                 "ChangeInstructorRequestStatus @RequestId, @NewStatus",
@@ -81,7 +83,7 @@ namespace CodixaApi.Services
 
         public async Task<IdentityResult> RegisterAdminAsync(registerAdminRequestDto registerAdminRequestDto)
         {
-           
+
             var user = new AppUser
             {
                 UserName = registerAdminRequestDto.UserName,
@@ -101,40 +103,40 @@ namespace CodixaApi.Services
                 // Assign role to the user
                 await _unitOfWork.UsersManger.AddToRoleAsync(user, "Admin");
 
-         
+
                 // Save the changes to the database
                 await _unitOfWork.Complete();
 
-               
+
             }
             return result;
         }
 
         public Task<List<ReturnAllApprovedInstructorsDto>> GetAllApprovedInstructors()
         {
-            
+
             return _unitOfWork.ExecuteStoredProcedureAsync<ReturnAllApprovedInstructorsDto>("GetAllApprovedInstructors");
 
         }
         //getallusers
-        public async Task <List<GetAllInstructorDto>> GetAllInstructors()
+        public async Task<List<GetAllInstructorDto>> GetAllInstructors()
         {
             try
             {
                 var Instructors = await _unitOfWork.UsersManger.GetAllInstructorsAsync();
-                List<GetAllInstructorDto> getAllInstructorDto = Instructors.Select(x=>new GetAllInstructorDto
+                List<GetAllInstructorDto> getAllInstructorDto = Instructors.Select(x => new GetAllInstructorDto
                 {
                     Id = x.Id,
-                    UserName=x.UserName,
-                    Email=x.Email,
-                    Specialty =x.Instructor.Specialty,
-                    InstructorFullName =x.Instructor.InstructorFullName,
+                    UserName = x.UserName,
+                    Email = x.Email,
+                    Specialty = x.Instructor.Specialty,
+                    InstructorFullName = x.Instructor.InstructorFullName,
                     ProfilePic = x.Photo != null ? x.Photo.FilePath : "",
                     PhoneNumber = x.PhoneNumber
-                } ).ToList();
+                }).ToList();
 
                 return getAllInstructorDto;
-           
+
             }
             catch (Exception ex)
             {
@@ -171,16 +173,19 @@ namespace CodixaApi.Services
             try
             {
 
-                
+
                 var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(u => u.Id == getAllInstructorDto.Id, x => x.Include(x => x.Instructor), x => x.Include(x => x.Photo));
 
                 if (User == null)
                 {
                     throw new Exception("User Not Found");
                 }
-       
+
                 if (!string.IsNullOrWhiteSpace(getAllInstructorDto.UserName))
-                    User.UserName = getAllInstructorDto.UserName;
+                {
+                    await _unitOfWork.UsersManger.ChangeUserNameAsync(User, getAllInstructorDto.UserName);
+                }
+
 
                 if (!string.IsNullOrWhiteSpace(getAllInstructorDto.Email))
                     User.Email = getAllInstructorDto.Email;
@@ -197,6 +202,10 @@ namespace CodixaApi.Services
                 FileEntity file = new FileEntity();
                 if (getAllInstructorDto.ProfilePic != null)
                 {
+                    if (User.Photo != null)
+                    {
+                        await _unitOfWork.Files.DeleteAsync(User.Photo);
+                    }
                     file = await _unitOfWork.Files.UploadFileAsync(getAllInstructorDto.ProfilePic, Path.Combine("uploads", "UsersPics"));
                     if (file != null)
                     {
@@ -235,10 +244,13 @@ namespace CodixaApi.Services
                 {
                     throw new Exception("User Not Found");
                 }
-           
+
 
                 if (!string.IsNullOrWhiteSpace(getAllStudentsDto.UserName))
-                    User.UserName = getAllStudentsDto.UserName;
+                {
+                    await _unitOfWork.UsersManger.ChangeUserNameAsync(User, getAllStudentsDto.UserName);
+                }
+     
 
                 if (!string.IsNullOrWhiteSpace(getAllStudentsDto.Email))
                     User.Email = getAllStudentsDto.Email;
@@ -253,7 +265,11 @@ namespace CodixaApi.Services
                 FileEntity file = new FileEntity();
                 if (getAllStudentsDto.ProfilePic != null)
                 {
-                     file = await _unitOfWork.Files.UploadFileAsync(getAllStudentsDto.ProfilePic, Path.Combine("uploads", "UsersPics"));
+                    if (User.Photo != null)
+                    {
+                        await _unitOfWork.Files.DeleteAsync(User.Photo);
+                    }
+                    file = await _unitOfWork.Files.UploadFileAsync(getAllStudentsDto.ProfilePic, Path.Combine("uploads", "UsersPics"));
                     if (file != null)
                     {
                         User.Photo = file;
@@ -264,7 +280,7 @@ namespace CodixaApi.Services
                 await _unitOfWork.Complete();
 
 
-                return new GetAllStudentsDto { Id = User.Id,Email=User.Email,UserName=User.UserName,PhoneNumber=User.PhoneNumber,ProfilePic=file?.FilePath,StudentFullName = User.Student.StudentFullName};
+                return new GetAllStudentsDto { Id = User.Id, Email = User.Email, UserName = User.UserName, PhoneNumber = User.PhoneNumber, ProfilePic = file?.FilePath, StudentFullName = User.Student.StudentFullName };
             }
             catch (Exception ex)
             {
@@ -282,6 +298,94 @@ namespace CodixaApi.Services
                     return "Password Changed successfully";
                 else
                     return "An unexpected error occurred while changing password";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+
+
+        public async Task<List<AdminGetDto>> GetallAdmins()
+        {
+            try
+            {
+                var admins = await _unitOfWork.UsersManger.GetUsersInRoleAdmin();
+                List<AdminGetDto> Admins = admins.Select(x => new AdminGetDto
+                {
+                    UserId = x.Id,
+                    UserName = x.UserName,
+                    PhoneNumber = x.PhoneNumber,
+                    Email = x.Email,
+                    PhotoPath = x.Photo != null ? x.Photo.FilePath : "",
+
+                }).ToList();
+
+
+
+                return Admins;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+
+
+        public async Task<AdminGetDto> UpdateAdminData (UpdateAdminDto updateAdminDto)
+        {
+            try
+            {
+                if(updateAdminDto.UserId == null)
+                {
+                    throw new Exception("Enter UserId");
+                }
+                var User = await _unitOfWork.UsersManger.FirstOrDefaultAsync(x => x.Id == updateAdminDto.UserId, x => x.Include(x => x.Photo));
+                if(User == null)
+                {
+                    throw new Exception("Cant Find This User");
+                }
+
+                if (!string.IsNullOrWhiteSpace(updateAdminDto.Email))
+                    User.Email = updateAdminDto.Email;
+
+
+                if (!string.IsNullOrWhiteSpace(updateAdminDto.UserName))
+                {
+                    await _unitOfWork.UsersManger.ChangeUserNameAsync(User, updateAdminDto.UserName);
+                }
+
+
+
+                if (!string.IsNullOrWhiteSpace(updateAdminDto.PhoneNumber))
+                    User.PhoneNumber = updateAdminDto.PhoneNumber;
+
+                FileEntity file = new FileEntity();
+                if (updateAdminDto.NewPhoto != null)
+                {
+                    if (User.Photo != null)
+                    {
+                        await _unitOfWork.Files.DeleteAsync(User.Photo);
+                    }
+                    file = await _unitOfWork.Files.UploadFileAsync(updateAdminDto.NewPhoto, Path.Combine("uploads", "UsersPics"));
+                    if (file != null)
+                    {
+                        User.Photo = file;
+                    }
+                }
+                User = await _unitOfWork.UsersManger.UpdateAsync(User);
+                await _unitOfWork.Complete();
+
+                return new AdminGetDto
+                {
+                    UserId = User.Id,
+                    UserName = User.UserName,
+                    PhoneNumber = User.PhoneNumber,
+                    Email = User.Email,
+                    PhotoPath = User.Photo != null ? User.Photo.FilePath : "",
+                };
+
             }
             catch (Exception ex)
             {
